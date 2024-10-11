@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제품 검색 챗봇</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>안녕하세요! 넘버를 입력 해 주시면 <br>함께 제품을 찾아드릴게요!</h1>
+            <form id="search-form">
+                <label for="cert_num">인증번호:</label>
+                <input type="text" id="cert_num" name="cert_num" placeholder="인증번호를 입력하세요">
+
+                <label for="model_name">모델명:</label>
+                <input type="text" id="model_name" name="model_name" placeholder="모델명을 입력하세요">
+
+                <button type="submit">검색</button>
+            </form>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

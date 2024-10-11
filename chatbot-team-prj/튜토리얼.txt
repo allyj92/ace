@@ -1,0 +1,12 @@
+streamlit-integration
+==> spring boot / streamlit(app2.py) 
+
+jpg ==> 테스트하기 위한 이미지들
+
+app2.py ==> streamlit 클라이언트
+
+휴지통 ==> 혹시몰라 기존 db 남겨둠
+
+원본 ==> api 데이터 원본
+
+codeData ==> 데이터
