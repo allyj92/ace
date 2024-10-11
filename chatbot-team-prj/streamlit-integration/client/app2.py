@@ -8,6 +8,11 @@ import cv2
 from PIL import Image
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
+import torch
+import sklearn
+import os
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+torch.set_num_threads(1)
 
 # EasyOCR Reader 생성
 reader = easyocr.Reader(['ko', 'en'], gpu=False)
