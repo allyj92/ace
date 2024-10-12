@@ -16,10 +16,11 @@ public class ProductDocument {
 
     private String certificationNumber;
     private double current;
+    @Column(length = 5000)
     private String imageUrl;
     private String modelName;
     private String productName;
-    @Column(length = 20000)
+    @Column(length = 10000)
     private String productUrl;
     private double voltage;
 
