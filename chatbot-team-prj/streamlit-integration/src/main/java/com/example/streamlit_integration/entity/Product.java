@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Table(name = "product")  // 테이블 이름을 명시적으로 지정
-public class ProductDocument {
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // IDENTITY 전략 사용
     private Integer id;

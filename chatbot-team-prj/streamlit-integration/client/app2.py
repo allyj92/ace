@@ -92,7 +92,7 @@ def count_click(product_name):
     if product_name not in st.session_state['click_counts']:
         st.session_state['click_counts'][product_name] = 0
     st.session_state['click_counts'][product_name] += 1
-    st.write(f"{product_name} 링크 클릭 수: {st.session_state['click_counts'][product_name]}")
+    st.write(f"clicked : {st.session_state['click_counts'][product_name]}")
 
 # 로그인 및 회원가입 버튼을 우측 상단에 배치
 st.markdown("""
@@ -100,17 +100,24 @@ st.markdown("""
     .button-container {
         display: flex;
         justify-content: flex-end;
-        margin-top: -50px;
+        margin-top: 20px;
     }
     .button-container a {
         text-decoration: none;
         font-size: 16px;
-        color: #000; /* 글씨 색상 */
-        padding: 10px 10px;
+        color: grey; /* Button text color */
+        padding: 10px 20px;
         margin-left: 10px;
+        background-color: #ffffff; /* Button background color */
+        border-radius: 8px; /* Rounded corners */
+        border: 1px solid #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+        transition: all 0.3s ease; /* Smooth transition on hover */
     }
     .button-container a:hover {
-        text-decoration: underline;
+        background-color: #f9f9f9; /* Slightly darker green on hover */
+        color: #707159; /* Maintain text color on hover */
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
     }
     </style>
     <div class="button-container">
@@ -123,7 +130,11 @@ st.markdown("""
 
 
 # 앱 제목
-st.title('OCR 기반 인증번호 및 V/A 유사 제품 검색')
+st.markdown("""
+    <h1 style='text-align: center; margin: 50px 0;'>
+        챗봇 제품검색 서비스
+    </h1>
+""", unsafe_allow_html=True)
 
 # 세션 상태 초기화
 if 'cert_num_confirmed' not in st.session_state:
@@ -140,9 +151,17 @@ df = load_data()
 
 # 엑셀 데이터를 성공적으로 불러왔는지 확인 후 출력
 if df is not None:
-    st.write("챗봇이 함께 제품을 찾아드리겠습니다")
+    st.markdown("""
+        <p style='text-align: center; font-size: 18px;margin-bottom:30px'>
+            고성능의 OCR 인공지능 챗봇이 빠르게 스캔하여 정확한 제품을 추천드립니다.
+        </p>
+    """, unsafe_allow_html=True)
 else:
-    st.write("데이터를 불러올 수 없습니다.")
+    st.markdown("""
+        <p style='text-align: center; font-size: 18px;'>
+            데이터를 불러올 수 없습니다.
+        </p>
+    """, unsafe_allow_html=True)
 
 # 이미지 파일 업로더
 if df is not None:
@@ -169,11 +188,11 @@ if st.session_state.uploaded_file:
 
     # 인증번호가 없을 경우 V/A 검색
     if not cert_nums:
-        st.write("**🤖 챗봇:** 인증번호로 제품을 찾기 어렵습니다. V/A 값을 기반으로 검색을 진행합니다...")
+        st.write("**🤖 챗봇:** 인증번호로 제품을 찾기 어렵습니다. 정격출력 V/A 값을 기반으로 검색을 진행합니다...")
         time.sleep(3)
-
+        similar_products = None  # Initialize to None
         if v_value and a_value:
-            with st.spinner("V/A 검색 중입니다. 잠시만 기다려주세요..."):
+            with st.spinner("정격출력 V/A 검색 중입니다. 잠시만 기다려주세요..."):
                 time.sleep(3)
             similar_products = calculate_similarity(f"{v_value}V {a_value}A", df, 'V')
             if not similar_products.empty:
@@ -190,15 +209,53 @@ if st.session_state.uploaded_file:
 
                     # 제품 링크 및 찜하기 기능
                     if product_url != 'URL 없음':
-                        if st.button(f"📎 {product_name} 링크 이동", key=f"link_{product_name}"):
-                            count_click(product_name)
-                            st.markdown(f"[제품 페이지로 이동]({product_url})", unsafe_allow_html=True)
-                        if st.button(f"❤️ {product_name} 찜하기", key=f"wishlist_{product_name}"):
-                            add_to_wishlist(product_name)
+                        # Add CSS to style both the 링크 이동 and 찜하기 buttons
+                        button_style = """
+                        <style>
+                            .button-container {
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                gap: 15px;  /* Space between the buttons */
+                            }
+                            .custom-button {
+                                display: inline-block;
+                                padding: 10px 20px;
+                                margin: 40px 0;
+                                background-color: #fff;
+                                border: 1px solid #ccc;
+                                border-radius: 5px;
+                                font-size: 16px;
+                                text-align: center;
+                                text-decoration: none;
+                                color: #000;
+                                transition: background-color 0.3s;
+                            }
+                            .custom-button:hover {
+                                background-color: #f7f7f7;
+                            }
+                        </style>
+                        """
+
+                        # Apply the button style using markdown
+                        st.markdown(button_style, unsafe_allow_html=True)
+
+                        # Create a container for both buttons using HTML
+                        st.markdown(
+                            f"""
+                            <div class="button-container">
+                                <a href="{product_url}" target="_blank" rel="noopener noreferrer" class="custom-button">📎 링크 이동</a>
+                                <a href="#" class="custom-button" onclick="alert('찜하기 버튼 클릭됨!')">❤️ 찜하기</a>
+                            </div>
+                            """, unsafe_allow_html=True
+                        )
                     else:
                         st.write(f"{product_name}에 대한 URL이 없습니다.")
 
                     st.markdown("---")  # 구분선 추가
+
+
+
             else:
                 st.write("해당 전류와 전압으로 유사 제품을 찾을 수 없습니다.")
 
@@ -224,52 +281,77 @@ if st.session_state.uploaded_file:
                     st.image(product_image, caption=product_name)
 
                 # 제품 링크 및 찜하기 기능
-                if product_url != 'URL 없음':
-                    if st.button:
-                                # 제품 링크 및 찜하기 기능
-                                if product_url != 'URL 없음':
-                                    if st.button(f"📎 {product_name} 링크 이동", key=f"link_{product_name}"):
-                                        count_click(product_name)
-                                        st.markdown(f"[제품 페이지로 이동]({product_url})", unsafe_allow_html=True)
-                                    if st.button(f"❤️ {product_name} 찜하기", key=f"wishlist_{product_name}"):
-                                        add_to_wishlist(product_name)
-                                else:
-                                    st.write(f"{product_name}에 대한 URL이 없습니다.")
+                # Loop through similar products and display them
+                if not similar_products.empty:
+                    st.write(f"인증번호 {cert_num}에 대한 유사 제품 검색 결과:")
 
-                                st.markdown("---")  # 구분선 추가
-                    else:
-                            st.write(f"해당 인증번호로 유사 제품을 찾을 수 없습니다. V/A로 다시 검색합니다.")
-                            time.sleep(3)
+                    for i, row in similar_products.iterrows():
+                        product_name = row['제품명']
+                        product_url = row.get('URL', 'URL 없음')
+                        product_image = row.get('Image', None)
 
-                            # V/A로 검색
-                            if v_value and a_value:
-                                with st.spinner("V/A로 검색 중입니다..."):
-                                    time.sleep(3)
-                                similar_products = calculate_similarity(f"{v_value}V {a_value}A", df, 'V')
-                                if not similar_products.empty:
-                                    for _, row in similar_products.iterrows():
-                                        product_name = row['제품명']
-                                        product_url = row.get('URL', 'URL 없음')
-                                        product_image = row.get('Image', None)
-                                        st.markdown(f"<h3 style='text-align: center;'>{product_name}</h3>", unsafe_allow_html=True)
+                        # Add "선택" text before each product name
+                        st.markdown(f"""
+                            <h2 style='text-align: center; font-size: 24px;'>
+                                선택 {i + 1}
+                            </h2>
+                        """, unsafe_allow_html=True)
 
-                                        # 제품 이미지 표시
-                                        if product_image:
-                                            st.image(product_image, caption=product_name)
+                        # Display product name in the center with larger font
+                        st.markdown(f"""
+                            <h3 style='text-align: center; font-size: 22px;'>
+                                {product_name}
+                            </h3>
+                        """, unsafe_allow_html=True)
 
-                                        # 제품 링크 및 찜하기 기능
-                                        if product_url != 'URL 없음':
-                                            if st.button(f"📎 {product_name} 링크 이동", key=f"link_{product_name}"):
-                                                count_click(product_name)
-                                                st.markdown(f"[제품 페이지로 이동]({product_url})", unsafe_allow_html=True)
-                                            if st.button(f"❤️ {product_name} 찜하기", key=f"wishlist_{product_name}"):
-                                                add_to_wishlist(product_name)
-                                        else:
-                                            st.write(f"{product_name}에 대한 URL이 없습니다.")
+                        # Display product image
+                        if product_image:
+                            st.image(product_image, caption=product_name, use_column_width=True)
 
-                                        st.markdown("---")  # 구분선 추가
-                                else:
-                                    st.write("해당 전류와 전압으로 유사 제품을 찾을 수 없습니다.")
+                        # Product link and 찜하기 button
+                        if product_url != 'URL 없음':
+                            button_style = """
+                            <style>
+                                .button-container {
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    gap: 15px;  /* Space between the buttons */
+                                }
+                                .custom-button {
+                                    display: inline-block;
+                                    padding: 10px 20px;
+                                    margin: 40px 0;
+                                    background-color: #fff;
+                                    border: 1px solid #ccc;
+                                    border-radius: 5px;
+                                    font-size: 16px;
+                                    text-align: center;
+                                    text-decoration: none;
+                                    color: #000;
+                                    transition: background-color 0.3s;
+                                }
+                                .custom-button:hover {
+                                    background-color: #f7f7f7;
+                                }
+                            </style>
+                            """
+
+                            # Apply the button style using markdown
+                            st.markdown(button_style, unsafe_allow_html=True)
+
+                            # Create a container for both buttons using HTML
+                            st.markdown(f"""
+                                <div class="button-container">
+                                    <a href="{product_url}" target="_blank" rel="noopener noreferrer" class="custom-button">📎 링크 이동</a>
+                                    <a href="#" class="custom-button" onclick="alert('찜하기 버튼 클릭됨!')">❤️ 찜하기</a>
+                                </div>
+                            """, unsafe_allow_html=True)
+                        else:
+                            st.write(f"{product_name}에 대한 URL이 없습니다.")
+
+                        st.markdown("---")  # 구분선 추가
+
 
                 # 찜한 제품 목록 표시
                 if st.session_state.wishlist:

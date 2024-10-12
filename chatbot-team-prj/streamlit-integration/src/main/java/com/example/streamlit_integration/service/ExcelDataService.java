@@ -1,6 +1,6 @@
 package com.example.streamlit_integration.service;
 
-import com.example.streamlit_integration.entity.ProductDocument;
+import com.example.streamlit_integration.entity.Product;
 import com.example.streamlit_integration.repository.ProductDocumentRepository;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
@@ -26,10 +26,10 @@ public class ExcelDataService {
         Workbook workbook = new XSSFWorkbook(fileInputStream);
         Sheet sheet = workbook.getSheetAt(0);  // 첫 번째 시트 읽기
 
-        List<ProductDocument> documents = new ArrayList<>();
+        List<Product> documents = new ArrayList<>();
 
         for (Row row : sheet) {
-            ProductDocument document = new ProductDocument();
+            Product document = new Product();
 
             // 인증번호 (문자열로 읽기)
             if (row.getCell(0) != null && row.getCell(0).getCellType() == CellType.STRING) {
