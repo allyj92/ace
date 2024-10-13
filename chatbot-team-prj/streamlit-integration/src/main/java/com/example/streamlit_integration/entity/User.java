@@ -32,10 +32,13 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;     // 이메일
 
-    @Column(nullable = false)
+    @Column
     private String address;   // 주소
 
-    private int wishlistCount = 0;  // 찜하기 카운팅
+    @Column
+    private String phoneNumber;   // 주소
+
+//    private int wishlistCount = 0;  // 찜하기 카운팅
 
     @Column(updatable = false)
     private LocalDateTime createdDate;  // 생성일
