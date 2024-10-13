@@ -113,38 +113,7 @@ def count_click(product_name):
     st.session_state['click_counts'][product_name] += 1
     st.write(f"clicked : {st.session_state['click_counts'][product_name]}")
 
-# 로그인 및 회원가입 버튼을 우측 상단에 배치
-st.markdown("""
-    <style>
-    .button-container {
-        display: flex;
-        justify-content: flex-end;
-        margin-top: 20px;
-    }
-    .button-container a {
-        text-decoration: none;
-        font-size: 16px;
-        color: grey; /* Button text color */
-        padding: 10px 20px;
-        margin-left: 10px;
-        background-color: #ffffff; /* Button background color */
-        border-radius: 8px; /* Rounded corners */
-        border: 1px solid #ffffff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
-        transition: all 0.3s ease; /* Smooth transition on hover */
-    }
-    .button-container a:hover {
-        background-color: #f9f9f9; /* Slightly darker green on hover */
-        color: #707159; /* Maintain text color on hover */
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
-    }
-    </style>
-    <div class="button-container">
-        <a href="/login">로그인</a>
-        <a href="/signup">회원가입</a>
-        <a href="/mypage">마이페이지</a>
-    </div>
-""", unsafe_allow_html=True)
+
 
 
 
