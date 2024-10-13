@@ -44,7 +44,7 @@ reader = easyocr.Reader(['ko', 'en'], gpu=False)
 def load_data():
     try:
         # 엑셀 파일에서 데이터 로드
-        df = pd.read_excel('codeData.xlsx')  # 엑셀 파일 이름을 'codeData.xlsx'로 가정
+        df = pd.read_excel('./codeData.xlsx')  # 엑셀 파일 이름을 'codeData.xlsx'로 가정
         return df
     except Exception as e:
         st.error(f"데이터를 불러오는 중 오류가 발생했습니다: {e}")
