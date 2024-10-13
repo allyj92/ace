@@ -35,8 +35,8 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.2.3' // Excel 파일 처리를 위한 라이브러리
 	implementation 'org.springframework.boot:spring-boot-starter-web'  // 웹 애플리케이션일 경우
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+//	implementation 'org.springframework.boot:spring-boot-starter-security'
+//	implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
 }
 
 tasks.named('test') {

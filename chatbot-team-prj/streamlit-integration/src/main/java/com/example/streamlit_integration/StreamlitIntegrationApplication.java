@@ -19,7 +19,7 @@ public class StreamlitIntegrationApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		// 엑셀 파일 경로 설정
-		String filePath = "C:\\Users\\임은재\\Desktop\\streamlit-integration\\client\\codeData.xlsx";
+		String filePath = "C:\\Users\\임은재\\Desktop\\aice\\chatbot-team-prj\\streamlit-integration\\client\\codeData.xlsx";
 		excelDataService.readExcelFile(filePath);
 	}
 }
