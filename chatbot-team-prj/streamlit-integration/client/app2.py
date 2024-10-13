@@ -10,6 +10,25 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 import torch
 import os
+import requests
+
+
+def login_page():
+    st.title("로그인")
+
+    username = st.text_input("아이디")
+    password = st.text_input("비밀번호", type="password")
+
+    if st.button("로그인"):
+        login_data = {"username":username,"password":password}
+        response = requests.post("http://localhost:8080/api/login", json=login_data)
+
+        if response.status_code == 200:
+            st.success("로그인 성공!")
+            st.experimental_rerun()
+        else:
+            st.error("로그인 실패. 아이디와 비밀번호를 확인하세요.")
+
 
 
 
