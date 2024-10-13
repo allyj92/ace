@@ -20,7 +20,7 @@ public class UserService {
         String password = loginDto.getPassword();
 
         // Fetch user by username from the repository
-        Optional<User> userOptional = Optional.ofNullable(userRepository.findByUsername(username));
+        Optional<User> userOptional = userRepository.findByUsername(username);
 
         // Check if user exists and the password matches
         if (userOptional.isPresent()) {
@@ -29,5 +29,25 @@ public class UserService {
         }
 
         return false; // Return false if user not found or password doesn't match
+    }
+
+    public boolean registerUser(User user) {
+        // Check if the username already exists
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            return false;  // Username already exists, registration fails
+        }
+
+        // Save the new user to the database
+        userRepository.save(user);
+        return true;
+    }
+
+    public boolean authenticateUser(String username, String password) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            return user.getPassword().equals(password);  // Assuming plain-text password, use hashing in production
+        }
+        return false;
     }
 }

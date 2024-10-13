@@ -60,4 +60,6 @@ public class User {
     protected void onUpdate() {
         updatedDate = LocalDateTime.now();
     }
+
+
 }

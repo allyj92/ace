@@ -1,6 +1,8 @@
 package com.example.streamlit_integration.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -10,6 +12,8 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "product")  // 테이블 이름을 명시적으로 지정
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product {
 
     @Id

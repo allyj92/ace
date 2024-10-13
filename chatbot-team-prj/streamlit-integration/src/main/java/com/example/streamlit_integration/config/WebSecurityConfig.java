@@ -3,29 +3,27 @@ package com.example.streamlit_integration.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
-public class SecurityConfig {
+public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .csrf().disable() // CSRF 보호를 비활성화할 경우 사용 (선택)
                 .authorizeRequests()
-                .antMatchers("/login", "/signup", "/signup.html").permitAll()  // 로그인, 회원가입 페이지 접근 허용
-                .anyRequest().authenticated()  // 다른 페이지는 인증 필요
+                .antMatchers("/auth/login", "/auth/signup").permitAll() // 로그인 및 회원가입 경로 허용
+                .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 .and()
                 .formLogin()
-                .loginPage("/login")  // 커스텀 로그인 페이지
-                .defaultSuccessUrl("/mypage", true)  // 로그인 성공 시 리디렉션할 페이지
+                .loginPage("/auth/login") // 커스텀 로그인 페이지 경로
+                .permitAll()
                 .and()
                 .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")  // 로그아웃 성공 후 리디렉션
                 .permitAll();
 
         return http.build();
@@ -33,12 +31,12 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        var manager = new InMemoryUserDetailsManager();
-        manager.createUser(User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
+        // 기본 사용자 생성 (테스트용)
+        var user = User.withUsername("user")
+                .password("{noop}password") // {noop}은 비밀번호 암호화를 생략하는 방법
                 .roles("USER")
-                .build());
-        return manager;
+                .build();
+
+        return new InMemoryUserDetailsManager(user);
     }
 }
