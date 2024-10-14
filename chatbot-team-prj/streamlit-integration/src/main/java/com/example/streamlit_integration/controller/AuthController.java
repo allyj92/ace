@@ -29,22 +29,15 @@ public class AuthController {
         }
     }
 
-    // 회원가입 처리
+    // 회원가입 처리 API
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) {
-        if (userDto.getUsername() == null || userDto.getPassword() == null || userDto.getName() == null || userDto.getEmail() == null) {
-            return ResponseEntity.badRequest().body("필수 정보를 모두 입력해주세요.");
-        }
+    public ResponseEntity<String> signup(@RequestBody UserDto userDto) {
+        boolean isRegistered = userService.registerUser(userDto);
 
-        try {
-            boolean isRegistered = userService.registerUser(userDto);
-            if (isRegistered) {
-                return ResponseEntity.ok("회원가입에 성공했습니다.");
-            } else {
-                return ResponseEntity.badRequest().body("이미 존재하는 사용자입니다.");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원가입 중 오류가 발생했습니다.");
+        if (isRegistered) {
+            return ResponseEntity.ok("회원가입 성공!");
+        } else {
+            return ResponseEntity.badRequest().body("회원가입 실패: 이미 존재하는 사용자명입니다.");
         }
     }
 }

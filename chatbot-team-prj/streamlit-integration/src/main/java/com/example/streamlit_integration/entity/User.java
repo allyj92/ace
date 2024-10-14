@@ -32,10 +32,10 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;     // 이메일
 
-    @Column
+    @Column(nullable = false)
     private String address;   // 주소
 
-    @Column
+    @Column(nullable = false)
     private String phoneNumber;   // 주소
 
     @ElementCollection

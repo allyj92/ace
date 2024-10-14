@@ -7,6 +7,7 @@ import com.example.streamlit_integration.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service  // 이 클래스가 서비스 계층임을 나타내는 어노테이션
@@ -33,12 +34,7 @@ public class UserService {
         return false;  // 사용자가 없거나 비밀번호가 틀린 경우 로그인 실패
     }
 
-    /***********************************************************************************/
-
-
-
-
-    /************************     회원가입 부분      ***************************/
+    /*************************     회원가입 부분       **************************/
     // 회원가입 처리 메서드
     public boolean registerUser(UserDto userDto) {
         // 사용자명이 중복되는지 확인
@@ -48,15 +44,15 @@ public class UserService {
         if (existingUser.isPresent()) {
             System.out.println("이미 존재하는 사용자명: " + userDto.getUsername());
             return false;  // 중복 사용자
-        } else {
-            System.out.println("새로운 사용자명: " + userDto.getUsername());
         }
 
         // UserDto 객체를 User 엔티티로 변환
         User newUser = new User();
-        newUser.setUsername(userDto.getUsername());  // 사용자명 설정
-        newUser.setPassword(userDto.getPassword());  // 비밀번호 설정 (암호화 필요)
-        newUser.setEmail(userDto.getEmail());  // 이메일 설정
+        newUser.setUsername(userDto.getUsername());
+        newUser.setPassword(userDto.getPassword());
+        newUser.setName(userDto.getName());  // name 필드 설정
+        newUser.setEmail(userDto.getEmail());
+        newUser.setAddress(userDto.getAddress());  // address 필드 설정
         newUser.setPhoneNumber(userDto.getPhoneNumber());  // 전화번호 설정
 
         // 새로운 사용자 정보를 DB에 저장
@@ -70,19 +66,19 @@ public class UserService {
         }
     }
 
-    /*******************************************************************************/
-
-
-
-    // Read
-
-    // Read - 1 : username(id) 으로 조회
+    /*************************     Read 부분       **************************/
+    // 사용자명으로 사용자 조회
     public Optional<User> findUserByUsername(String username) {
         return userRepository.findByUsername(username);  // 사용자명을 이용해 DB에서 사용자 조회
     }
 
+    // 모든 사용자 조회
+    public List<User> findAllUsers() {
+        return userRepository.findAll();  // DB에서 모든 사용자 조회
+    }
 
-    // Update
+    /*************************     Update 부분       **************************/
+    // 사용자 정보 업데이트
     public boolean updateUser(UserDto userDto) {
         // 사용자명으로 사용자 정보 조회
         Optional<User> userOpt = userRepository.findByUsername(userDto.getUsername());
@@ -92,7 +88,6 @@ public class UserService {
             User user = userOpt.get();  // 기존 사용자 정보 가져오기
             user.setEmail(userDto.getEmail());  // 이메일 업데이트
             user.setPhoneNumber(userDto.getPhoneNumber());  // 전화번호 업데이트
-            user.setName(userDto.getName());  // 이름 업데이트
 
             userRepository.save(user);  // 수정된 사용자 정보 DB에 저장
             return true;  // 업데이트 성공 시 true 반환
@@ -100,12 +95,17 @@ public class UserService {
         return false;  // 사용자가 없으면 업데이트 실패
     }
 
+    /*************************     Delete 부분       **************************/
+    // 사용자 삭제
+    public boolean deleteUserByUsername(String username) {
+        // 사용자명으로 사용자 조회
+        Optional<User> userOpt = userRepository.findByUsername(username);
 
-
-    // Delete
-
-
-
-
-
+        // 사용자가 존재하는 경우 삭제
+        if (userOpt.isPresent()) {
+            userRepository.delete(userOpt.get());  // 사용자 삭제
+            return true;  // 삭제 성공 시 true 반환
+        }
+        return false;  // 사용자가 없으면 삭제 실패
+    }
 }

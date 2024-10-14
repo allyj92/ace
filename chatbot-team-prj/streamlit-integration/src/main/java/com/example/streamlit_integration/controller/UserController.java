@@ -20,8 +20,12 @@ public class UserController {
     private UserService userService;
 
     // 사용자 정보 업데이트 API
+    // 사용자 정보 업데이트 API
     @PutMapping("/update")
     public ResponseEntity<String> updateUser(@RequestBody UserDto userDto) {
+        // 디버깅용 로그 출력
+        System.out.println("Updating user: " + userDto.getUsername() + ", " + userDto.getEmail() + ", " + userDto.getPhoneNumber());
+
         boolean isUpdated = userService.updateUser(userDto);
 
         if (isUpdated) {

@@ -5,7 +5,6 @@ import requests
 API_BASE_URL = "http://localhost:8080"
 
 # 세션 상태 초기화
-# Streamlit의 세션 상태에 사용자 정보 및 로그인 상태를 저장
 if 'wishlist' not in st.session_state:
     st.session_state['wishlist'] = []  # 찜한 상품 목록을 서버에서 가져옴
 if 'username' not in st.session_state:
@@ -13,20 +12,15 @@ if 'username' not in st.session_state:
 if 'email' not in st.session_state:
     st.session_state['email'] = ''  # 이메일 초기화
 if 'phone_number' not in st.session_state:
-    st.session_state['phone_number'] = ''  # 전화번호 초기화
+    st.session_state['phone_number'] = '0'  # 전화번호 초기화
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False  # 로그인 상태 초기화
 
 # 서버에서 사용자 정보와 찜한 상품 목록을 가져오는 함수
 def load_user_data():
-    # 사용자 정보 요청 API 호출
     response = requests.get(f"{API_BASE_URL}/user/{st.session_state['username']}")
     if response.status_code == 200:
         user_data = response.json()  # 서버로부터 사용자 정보 JSON 형태로 가져옴
-
-        # 디버깅을 위한 출력: 서버에서 받아온 데이터를 출력
-        st.write(f"받은 데이터: {user_data}")
-
         st.session_state['username'] = user_data['username']  # 사용자명 설정
         st.session_state['email'] = user_data['email']  # 이메일 설정
         st.session_state['phone_number'] = user_data['phone_number']  # 전화번호 설정
@@ -35,20 +29,17 @@ def load_user_data():
         st.error("사용자 정보를 불러오는 데 실패했습니다.")  # API 호출 실패 시 에러 메시지
 
 # 사용자 정보를 서버에 업데이트하는 함수
-def update_user_info(username, email, phone_number):
-    # 사용자 정보를 서버로 전송할 페이로드 생성
+def update_user_info(email, phone_number):
     payload = {
-        "username": username,
+        "username": st.session_state['username'],  # 로그인된 사용자명 사용
         "email": email,
         "phone_number": phone_number
     }
-    # 서버로 사용자 정보 업데이트 요청
     response = requests.put(f"{API_BASE_URL}/user/update", json=payload)
     return response.status_code == 200  # 업데이트 성공 여부 반환
 
 # 찜한 상품 목록을 모두 삭제하는 함수
 def delete_all_wishlist():
-    # 찜한 상품 목록 삭제 API 호출
     response = requests.delete(f"{API_BASE_URL}/user/{st.session_state['username']}/wishlist")
     return response.status_code == 200  # 삭제 성공 여부 반환
 
@@ -59,17 +50,14 @@ def mypage():
     # 사용자 정보 수정 섹션
     st.header("나의 정보 수정")
     with st.form(key='update_info'):
-        # 사용자 정보 입력 필드
-        new_username = st.text_input("아이디", value=st.session_state['username'])
         new_email = st.text_input("이메일", value=st.session_state['email'])
         new_phone_number = st.text_input("전화번호", value=st.session_state['phone_number'])
 
-        # 정보 수정 버튼 클릭 시 처리
+
+
+
         if st.form_submit_button("정보 수정"):
-            # 서버에 사용자 정보 업데이트 요청
-            if update_user_info(new_username, new_email, new_phone_number):
-                # 성공적으로 업데이트되면 세션 상태 업데이트
-                st.session_state['username'] = new_username
+            if update_user_info(new_email, new_phone_number):
                 st.session_state['email'] = new_email
                 st.session_state['phone_number'] = new_phone_number
                 st.success("정보가 성공적으로 수정되었습니다!")  # 성공 메시지 표시
@@ -78,7 +66,6 @@ def mypage():
 
     # 찜한 상품 목록 섹션
     st.header("찜한 상품 목록")
-    # 찜한 상품이 있을 경우 목록 표시
     if st.session_state['wishlist']:
         for product in st.session_state['wishlist']:
             st.write(f"- {product}")
@@ -87,7 +74,6 @@ def mypage():
 
     # 찜한 상품 모두 삭제 버튼
     if st.button("찜한 상품 모두 삭제"):
-        # 서버에 찜한 상품 삭제 요청
         if delete_all_wishlist():
             st.session_state['wishlist'].clear()  # 찜한 상품 목록 초기화
             st.success("찜한 상품이 모두 삭제되었습니다.")  # 성공 메시지
@@ -104,17 +90,12 @@ def mypage():
 def login_page():
     st.title("로그인")  # 로그인 페이지 제목 설정
 
-    # 로그인 상태가 아닌 경우
     if not st.session_state['logged_in']:
-        # 사용자명 및 비밀번호 입력 필드
         username = st.text_input("아이디")
         password = st.text_input("비밀번호", type="password")
 
-        # 로그인 버튼 클릭 시 처리
         if st.button("로그인"):
-            # 로그인 요청을 위한 데이터
             login_data = {"username": username, "password": password}
-            # 서버에 로그인 요청
             response = requests.post(f"{API_BASE_URL}/auth/login", json=login_data)
 
             if response.status_code == 200:
