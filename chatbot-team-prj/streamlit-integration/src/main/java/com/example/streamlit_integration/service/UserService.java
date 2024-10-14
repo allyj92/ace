@@ -15,6 +15,7 @@ public class UserService {
     @Autowired  // 의존성 주입으로 UserRepository를 자동으로 연결
     private UserRepository userRepository;
 
+    /*************************     로그인 부분       **************************/
     // 로그인 처리 메서드
     public boolean authenticateUser(LoginDto loginDto) {
         String username = loginDto.getUsername();  // 로그인 요청에서 받은 사용자명
@@ -32,6 +33,12 @@ public class UserService {
         return false;  // 사용자가 없거나 비밀번호가 틀린 경우 로그인 실패
     }
 
+    /***********************************************************************************/
+
+
+
+
+    /************************     회원가입 부분      ***************************/
     // 회원가입 처리 메서드
     public boolean registerUser(UserDto userDto) {
         // 사용자명이 중복되는지 확인
@@ -63,12 +70,19 @@ public class UserService {
         }
     }
 
-    // 사용자 정보 조회 메서드 (username으로 조회)
+    /*******************************************************************************/
+
+
+
+    // Read
+
+    // Read - 1 : username(id) 으로 조회
     public Optional<User> findUserByUsername(String username) {
         return userRepository.findByUsername(username);  // 사용자명을 이용해 DB에서 사용자 조회
     }
 
-    // 사용자 정보 업데이트 메서드
+
+    // Update
     public boolean updateUser(UserDto userDto) {
         // 사용자명으로 사용자 정보 조회
         Optional<User> userOpt = userRepository.findByUsername(userDto.getUsername());
@@ -85,4 +99,13 @@ public class UserService {
         }
         return false;  // 사용자가 없으면 업데이트 실패
     }
+
+
+
+    // Delete
+
+
+
+
+
 }

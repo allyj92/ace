@@ -102,7 +102,7 @@ def mypage():
 
 # 로그인 페이지 UI
 def login_page():
-    st.title("로그인 페이지")  # 로그인 페이지 제목 설정
+    st.title("로그인")  # 로그인 페이지 제목 설정
 
     # 로그인 상태가 아닌 경우
     if not st.session_state['logged_in']:
