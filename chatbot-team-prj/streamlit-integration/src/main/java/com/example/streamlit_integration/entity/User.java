@@ -38,7 +38,8 @@ public class User {
     @Column
     private String phoneNumber;   // 주소
 
-//    private int wishlistCount = 0;  // 찜하기 카운팅
+    @ElementCollection
+    private List<String> wishlist;  // 찜 목록
 
     @Column(updatable = false)
     private LocalDateTime createdDate;  // 생성일
