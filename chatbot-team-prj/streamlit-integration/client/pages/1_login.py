@@ -24,7 +24,7 @@ def home_page():
         cookies['logged_in'] = 'false'  # 쿠키에서 로그인 상태 해제
         cookies.save()  # 쿠키 저장
         st.session_state['current_page'] = 'login'  # 로그인 페이지로 이동
-        st.experimental_rerun()  # 페이지 새로고침
+#         st.experimental_rerun()  # 페이지 새로고침
 
 # 로그인 페이지 함수
 def login_page():
@@ -47,7 +47,7 @@ def login_page():
             cookies.save()  # 쿠키 저장
             st.success("로그인 성공!")
             st.session_state['current_page'] = 'home'  # 로그인 성공 후 홈 페이지로 이동
-            st.experimental_rerun()  # 로그인 후 페이지 새로고침
+#             st.experimental_rerun()  # 로그인 후 페이지 새로고침
         else:
             st.error(f"로그인 실패: {response.text}")  # 서버 응답 메시지 출력
 

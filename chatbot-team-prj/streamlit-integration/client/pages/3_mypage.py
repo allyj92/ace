@@ -12,7 +12,7 @@ if 'username' not in st.session_state:
 if 'email' not in st.session_state:
     st.session_state['email'] = ''  # 이메일 초기화
 if 'phone_number' not in st.session_state:
-    st.session_state['phone_number'] = '0'  # 전화번호 초기화
+    st.session_state['phone_number'] = ''  # 전화번호 초기화
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False  # 로그인 상태 초기화
 
@@ -81,10 +81,6 @@ def display_wishlist():
     else:
         st.write("찜한 상품이 없습니다.")  # 찜한 상품이 없을 때 메시지 표시
 
-
-
-
-
 # 마이페이지 UI
 def mypage():
     st.title("마이페이지")  # 페이지 제목 설정
@@ -92,16 +88,24 @@ def mypage():
     # 사용자 정보 수정 섹션
     st.header("나의 정보 수정")
     with st.form(key='update_info'):
-        new_email = st.text_input("이메일", value=st.session_state['email'])
-        new_phone_number = st.text_input("전화번호", value=st.session_state['phone_number'])
+        # 로그인된 경우 세션에서 이메일과 전화번호를 불러오고, 로그아웃 상태일 경우 빈 값을 사용
+        if st.session_state['logged_in']:
+            new_email = st.text_input("이메일", value=st.session_state.get('email', ''))
+            new_phone_number = st.text_input("전화번호", value=st.session_state.get('phone_number', ''))
+        else:
+            new_email = st.text_input("이메일", value='')
+            new_phone_number = st.text_input("전화번호", value='')
 
         if st.form_submit_button("정보 수정"):
-            if update_user_info(new_email, new_phone_number):
-                st.session_state['email'] = new_email
-                st.session_state['phone_number'] = new_phone_number
-                st.success("정보가 성공적으로 수정되었습니다!")  # 성공 메시지 표시
+            if st.session_state['logged_in']:  # 로그인된 상태에서만 정보 수정 가능
+                if update_user_info(new_email, new_phone_number):
+                    st.session_state['email'] = new_email
+                    st.session_state['phone_number'] = new_phone_number
+                    st.success("정보가 성공적으로 수정되었습니다!")  # 성공 메시지 표시
+                else:
+                    st.error("정보 수정에 실패했습니다.")  # 실패 메시지 표시
             else:
-                st.error("정보 수정에 실패했습니다.")  # 실패 메시지 표시
+                st.error("로그인이 필요합니다.")  # 로그인되지 않은 상태에서는 수정 불가
 
     # 찜한 상품 목록 표시
     display_wishlist()
@@ -113,7 +117,6 @@ def mypage():
             st.success("찜한 상품이 모두 삭제되었습니다.")  # 성공 메시지
         else:
             st.error("찜한 상품 삭제에 실패했습니다.")  # 실패 메시지
-
 
     # 서버에서 유저의 찜 리스트를 불러오는 함수
     def load_wishlist_from_server(username):
@@ -131,14 +134,11 @@ def mypage():
     if 'logged_in' in st.session_state and st.session_state['logged_in']:
         load_wishlist_from_server(st.session_state['username'])
 
-
-
-
     # 로그아웃 버튼
     if st.button("로그아웃"):
         st.session_state.clear()  # 세션 상태 초기화
         st.session_state['logged_in'] = False  # 로그인 상태 해제
-        st.experimental_rerun()  # 페이지 새로고침으로 로그아웃 처리
+#         st.experimental_rerun()  # 페이지 새로고침으로 로그아웃 처리
 
 # 로그인 페이지 UI
 def login_page():
@@ -157,7 +157,7 @@ def login_page():
                 st.session_state['logged_in'] = True  # 로그인 상태 True
                 st.session_state['username'] = username  # 로그인된 사용자명 저장
                 load_user_data()  # 로그인 후 사용자 정보 불러오기
-                st.experimental_rerun()  # 페이지 새로고침으로 로그인 상태 반영
+#                 st.experimental_rerun()  # 페이지 새로고침으로 로그인 상태 반영
             else:
                 st.error("로그인 실패: 아이디 또는 비밀번호를 확인하세요.")  # 실패 시 에러 메시지
     else:
