@@ -126,14 +126,17 @@ def save_wishlist_to_server(wishlist, username):
 
 
 
-# 상품 찜하기 기능
+# 상품 찜하기 기능 (로그인 확인 추가)
 def add_to_wishlist(product):
-    # 상품 정보를 wishlist에 추가
-    if not any(item['name'] == product['name'] for item in st.session_state['wishlist']):
-        st.session_state['wishlist'].append(product)  # 찜 목록에 상품 추가
-        st.success(f"{product['name']}을(를) 찜 목록에 추가했습니다!")
+    if not st.session_state['logged_in']:
+        st.warning("로그인이 필요합니다.")
     else:
-        st.warning(f"{product['name']}은(는) 이미 찜 목록에 있습니다.")
+        # 상품 정보를 wishlist에 추가
+        if not any(item['name'] == product['name'] for item in st.session_state['wishlist']):
+            st.session_state['wishlist'].append(product)  # 찜 목록에 상품 추가
+            st.success(f"{product['name']}을(를) 찜 목록에 추가했습니다!")
+        else:
+            st.warning(f"{product['name']}은(는) 이미 찜 목록에 있습니다.")
 
 
 # 검색 결과를 표시하는 함수
