@@ -1,7 +1,10 @@
 package com.example.streamlit_integration.controller;
 
 import com.example.streamlit_integration.dto.UserDto;
+import com.example.streamlit_integration.dto.WishlistRequest;
+import com.example.streamlit_integration.entity.Product;
 import com.example.streamlit_integration.entity.User;
+import com.example.streamlit_integration.entity.WishlistItem;
 import com.example.streamlit_integration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,8 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
@@ -53,4 +58,32 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
         }
     }
+
+    // 찜 리스트 저장 API
+    @PostMapping("/wishlist")
+    public ResponseEntity<?> saveWishlist(@RequestBody WishlistRequest request) {
+        boolean success = userService.saveWishlist(request.getUsername(), request.getWishlist());
+        if (success) {
+            return ResponseEntity.ok("찜 리스트가 저장되었습니다.");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("찜 리스트 저장 실패");
+        }
+    }
+
+    // 유저의 찜 리스트 불러오기 API
+    @GetMapping("/{username}/wishlist")
+    public ResponseEntity<List<Product>> getWishlist(@PathVariable String username) {
+        List<WishlistItem> wishlistItems = userService.getWishlist(username);  // WishlistItem 리스트를 가져옴
+        if (wishlistItems != null) {
+            // WishlistItem에서 Product만 추출하여 List<Product>로 변환
+            List<Product> products = wishlistItems.stream()
+                    .map(WishlistItem::getProduct)  // WishlistItem에서 Product를 추출
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(products);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
 }

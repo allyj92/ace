@@ -2,8 +2,11 @@ package com.example.streamlit_integration.service;
 
 import com.example.streamlit_integration.dto.LoginDto;
 import com.example.streamlit_integration.dto.UserDto;
+import com.example.streamlit_integration.entity.Product;
 import com.example.streamlit_integration.entity.User;
+import com.example.streamlit_integration.entity.WishlistItem;
 import com.example.streamlit_integration.repository.UserRepository;
+import com.example.streamlit_integration.repository.WishlistItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,9 @@ public class UserService {
 
     @Autowired  // 의존성 주입으로 UserRepository를 자동으로 연결
     private UserRepository userRepository;
+
+    @Autowired
+    private WishlistItemRepository wishlistItemRepository;
 
     /*************************     로그인 부분       **************************/
     // 로그인 처리 메서드
@@ -64,6 +70,32 @@ public class UserService {
             System.out.println("회원가입 중 오류 발생: " + e.getMessage());
             return false;  // 저장 중 오류 발생 시 false 반환
         }
+    }
+
+    // 찜 리스트 저장 로직
+    public boolean saveWishlist(String username, List<Product> wishlistProducts) {
+        Optional<User> userOpt = userRepository.findByUsername(username);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            for (Product product : wishlistProducts) {
+                WishlistItem wishlistItem = new WishlistItem();
+                wishlistItem.setUser(user);
+                wishlistItem.setProduct(product);
+                wishlistItemRepository.save(wishlistItem);  // 찜 항목을 저장
+            }
+            return true;
+        }
+        return false;
+    }
+
+    // 찜 리스트 불러오기 로직
+    public List<WishlistItem> getWishlist(String username) {
+        Optional<User> userOpt = userRepository.findByUsername(username);  // findByUsername으로 사용자 검색
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();  // Optional에서 User 객체 가져오기
+            return wishlistItemRepository.findByUser(user);  // User 객체를 전달하여 사용자별 찜 리스트 반환
+        }
+        return null;
     }
 
     /*************************     Read 부분       **************************/

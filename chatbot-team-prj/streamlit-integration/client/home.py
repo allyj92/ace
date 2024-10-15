@@ -105,6 +105,27 @@ if 'wishlist' not in st.session_state:
 if 'products' not in st.session_state:
     st.session_state['products'] = []  # 검색된 상품 결과 저장
 
+
+# 서버로 찜 리스트를 저장하는 함수
+def save_wishlist_to_server(wishlist, username):
+    url = "http://localhost:8080/user/wishlist"  # 서버에 저장하는 API 엔드포인트
+    data = {
+        "username": username,
+        "wishlist": wishlist  # 찜한 상품 리스트를 서버로 전송
+    }
+    try:
+        response = requests.post(url, json=data)
+        if response.status_code == 200:
+            st.success("찜 리스트가 성공적으로 저장되었습니다.")
+        else:
+            st.error(f"서버 오류: {response.text}")
+    except Exception as e:
+        st.error(f"저장 중 오류가 발생했습니다: {e}")
+
+
+
+
+
 # 상품 찜하기 기능
 def add_to_wishlist(product):
     # 상품 정보를 wishlist에 추가
@@ -139,7 +160,11 @@ def display_search_results(similar_products):
 
             # 상품 URL 표시
             if product_url != 'URL 없음':
-                st.markdown(f"[상품 페이지로 이동하기]({product_url})", unsafe_allow_html=True)
+                 st.markdown(f"""
+                                <div style='text-align: center;'>
+                                    <a href="{product['url']}" target="_blank">📎 상세 페이지로 이동하기</a>
+                                </div>
+                            """, unsafe_allow_html=True)
 
             # 찜하기 버튼을 클릭하면 해당 상품 정보를 add_to_wishlist로 전달
             if st.button(f"❤️ 찜하기", key=f"wishlist_{i}"):
@@ -275,11 +300,14 @@ if st.session_state.uploaded_file:
                         # Create a container for both buttons using HTML
                         st.markdown(
                             f"""
-                            <div class="button-container">
-                                <a href="{product_url}" target="_blank" rel="noopener noreferrer" class="custom-button">📎 링크 이동</a>
-                                <a href="#" class="custom-button" onclick="alert('찜하기 버튼 클릭됨!')">❤️ 찜하기</a>
+                            <div style='text-align: center;'>
+                                <div class="button-container">
+                                    <a href="{product_url}" target="_blank" rel="noopener noreferrer" class="custom-button">📎 링크 이동</a>
+                                    <a href="#" class="custom-button" onclick="alert('찜하기 버튼 클릭됨!')">❤️ 찜하기</a>
+                                </div>
                             </div>
-                            """, unsafe_allow_html=True
+                            """,
+                            unsafe_allow_html=True
                         )
                     else:
                         st.write(f"{product_name}에 대한 URL이 없습니다.")
@@ -345,29 +373,28 @@ if st.session_state.uploaded_file:
                         if product_url != 'URL 없음':
                             button_style = """
                             <style>
-                                .button-container {
-                                    display: flex;
-                                    justify-content: center;
-                                    align-items: center;
-                                    gap: 15px;  /* Space between the buttons */
-                                }
-                                .custom-button {
-                                    display: inline-block;
-                                    padding: 10px 20px;
-                                    margin: 40px 0;
-                                    background-color: #fff;
-                                    border: 1px solid #ccc;
-                                    border-radius: 5px;
-                                    font-size: 16px;
-                                    text-align: center;
-                                    text-decoration: none;
-                                    color: #000;
-                                    transition: background-color 0.3s;
-                                }
-                                .custom-button:hover {
-                                    background-color: #f7f7f7;
-                                }
-                            </style>
+                                    .button-container {{
+                                        display: flex;
+                                        justify-content: center;  /* 수평 중앙 정렬 */
+                                        align-items: center;      /* 수직 중앙 정렬 */
+                                        gap: 15px;                /* 버튼 사이의 간격 */
+                                        margin: 20px 0;           /* 상하 여백 */
+                                    }}
+                                    .custom-button {{
+                                        padding: 10px 20px;
+                                        background-color: #fff;
+                                        border: 1px solid #ccc;
+                                        border-radius: 5px;
+                                        font-size: 16px;
+                                        text-align: center;
+                                        text-decoration: none;
+                                        color: #000;
+                                        transition: background-color 0.3s;
+                                    }}
+                                    .custom-button:hover {{
+                                        background-color: #f7f7f7;
+                                    }}
+                                </style>
                             """
 
                             # Apply the button style using markdown

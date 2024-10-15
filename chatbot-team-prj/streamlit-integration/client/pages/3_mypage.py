@@ -51,7 +51,6 @@ def display_wishlist():
     if st.session_state['wishlist']:
         # wishlist의 각 상품을 순회하며 처리
         for product in st.session_state['wishlist']:
-            st.write(f"현재 상품 데이터: {product}")  # 디버깅을 위해 product 데이터 출력
             if isinstance(product, dict):
                 product_name = product.get('name', '이름 없음')
                 product_image = product.get('image', None)
@@ -66,7 +65,16 @@ def display_wishlist():
 
                 # URL 링크 출력
                 if product_url:
-                    st.markdown(f"[상품 페이지로 이동하기]({product_url})", unsafe_allow_html=True)
+                    st.markdown(
+                        f"""
+                        <div style='display: flex; justify-content: center;'>
+                            <a href="{product_url}" target="_blank" style="text-decoration: none; background-color: #ebebeb; color: gray; padding: 10px 20px; border-radius: 5px; text-align: center;">
+                                상품 페이지로 이동하기
+                            </a>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
                 st.markdown("---")  # 구분선
             else:
                 st.error("상품 데이터가 올바르지 않습니다.")  # 잘못된 형식의 데이터 처리
@@ -105,6 +113,26 @@ def mypage():
             st.success("찜한 상품이 모두 삭제되었습니다.")  # 성공 메시지
         else:
             st.error("찜한 상품 삭제에 실패했습니다.")  # 실패 메시지
+
+
+    # 서버에서 유저의 찜 리스트를 불러오는 함수
+    def load_wishlist_from_server(username):
+        url = f"http://localhost:8080/user/{username}/wishlist"  # 유저의 찜 리스트를 불러오는 API 엔드포인트
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                st.session_state['wishlist'] = response.json()  # 서버에서 받은 찜 리스트를 세션에 저장
+            else:
+                st.error(f"찜 리스트를 불러오는 데 실패했습니다: {response.text}")
+        except Exception as e:
+            st.error(f"불러오는 중 오류가 발생했습니다: {e}")
+
+    # 로그인 후 유저의 찜 리스트 불러오기
+    if 'logged_in' in st.session_state and st.session_state['logged_in']:
+        load_wishlist_from_server(st.session_state['username'])
+
+
+
 
     # 로그아웃 버튼
     if st.button("로그아웃"):
