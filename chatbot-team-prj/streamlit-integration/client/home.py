@@ -184,13 +184,7 @@ def count_click(product_name):
 
 
 
-
-# 앱 제목
-st.markdown("""
-    <h1 style='text-align: center; margin: 50px 0;'>
-        챗봇 제품검색 서비스
-    </h1>
-""", unsafe_allow_html=True)
+st.image('logo.jpg' ,width=500)
 
 # 세션 상태 초기화
 if 'cert_num_confirmed' not in st.session_state:
@@ -207,11 +201,7 @@ df = load_data()
 
 # 엑셀 데이터를 성공적으로 불러왔는지 확인 후 출력
 if df is not None:
-    st.markdown("""
-        <p style='text-align: center; font-size: 18px;margin-bottom:30px'>
-            고성능의 OCR 인공지능 챗봇이 빠르게 스캔하여 정확한 제품을 추천드립니다.
-        </p>
-    """, unsafe_allow_html=True)
+    pass
 else:
     st.markdown("""
         <p style='text-align: center; font-size: 18px;'>
