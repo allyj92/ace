@@ -98,13 +98,56 @@ def extract_cert_num(text):
     cert_nums = re.findall(r'\b[A-Z]{2}\d{5}-\d{5}\b', text)
     return cert_nums
 
-# 제품 찜하기 기능
-def add_to_wishlist(product_name):
-    if product_name not in st.session_state['wishlist']:
-        st.session_state['wishlist'].append(product_name)
-        st.success(f"{product_name}을(를) 찜 목록에 추가했습니다!")
+
+# 세션 상태 초기화
+if 'wishlist' not in st.session_state:
+    st.session_state['wishlist'] = []  # 찜한 상품 목록 저장
+if 'products' not in st.session_state:
+    st.session_state['products'] = []  # 검색된 상품 결과 저장
+
+# 상품 찜하기 기능
+def add_to_wishlist(product):
+    # 상품 정보를 wishlist에 추가
+    if not any(item['name'] == product['name'] for item in st.session_state['wishlist']):
+        st.session_state['wishlist'].append(product)  # 찜 목록에 상품 추가
+        st.success(f"{product['name']}을(를) 찜 목록에 추가했습니다!")
     else:
-        st.warning(f"{product_name}은(는) 이미 찜 목록에 있습니다.")
+        st.warning(f"{product['name']}은(는) 이미 찜 목록에 있습니다.")
+
+
+# 검색 결과를 표시하는 함수
+def display_search_results(similar_products):
+    st.header("검색 결과")
+
+    if similar_products is not None:
+        for i, row in similar_products.iterrows():
+            product_name = row['제품명']
+            product_image = row.get('Image', None)  # 이미지 URL 또는 경로
+            product_url = row.get('URL', 'URL 없음')
+
+            # 상품 정보를 딕셔너리로 만들기
+            product = {
+                'name': product_name,
+                'image': product_image,
+                'url': product_url
+            }
+
+            # 상품 정보 출력
+            st.markdown(f"**상품명:** {product_name}")
+            if product_image:
+                st.image(product_image, caption=product_name)
+
+            # 상품 URL 표시
+            if product_url != 'URL 없음':
+                st.markdown(f"[상품 페이지로 이동하기]({product_url})", unsafe_allow_html=True)
+
+            # 찜하기 버튼을 클릭하면 해당 상품 정보를 add_to_wishlist로 전달
+            if st.button(f"❤️ 찜하기", key=f"wishlist_{i}"):
+                add_to_wishlist(product)
+
+            st.markdown("---")  # 구분선 추가
+
+
 
 # 링크 클릭 카운트 기능
 def count_click(product_name):
@@ -184,6 +227,7 @@ if st.session_state.uploaded_file:
                 time.sleep(3)
             similar_products = calculate_similarity(f"{v_value}V {a_value}A", df, 'V')
             if not similar_products.empty:
+                display_search_results(similar_products)
                 st.write(f"정격 출력 {v_value}V {a_value}A에 대한 유사 제품 검색 결과:")
                 for _, row in similar_products.iterrows():
                     product_name = row['제품명']
@@ -257,6 +301,7 @@ if st.session_state.uploaded_file:
             similar_products = calculate_similarity(cert_num, df, '인증번호')
 
         if not similar_products.empty:
+            display_search_results(similar_products)
             st.write(f"인증번호 {cert_num}에 대한 유사 제품 검색 결과:")
             for _, row in similar_products.iterrows():
                 product_name = row['제품명']

@@ -43,6 +43,40 @@ def delete_all_wishlist():
     response = requests.delete(f"{API_BASE_URL}/user/{st.session_state['username']}/wishlist")
     return response.status_code == 200  # 삭제 성공 여부 반환
 
+# 찜한 상품 목록 표시 섹션
+def display_wishlist():
+    st.header("찜한 상품 목록")
+
+    # wishlist가 있는지 확인
+    if st.session_state['wishlist']:
+        # wishlist의 각 상품을 순회하며 처리
+        for product in st.session_state['wishlist']:
+            st.write(f"현재 상품 데이터: {product}")  # 디버깅을 위해 product 데이터 출력
+            if isinstance(product, dict):
+                product_name = product.get('name', '이름 없음')
+                product_image = product.get('image', None)
+                product_url = product.get('url', 'URL 없음')
+
+                # 제품명 출력
+                st.write(f"**상품명:** {product_name}")
+
+                # 이미지 출력
+                if product_image:
+                    st.image(product_image, caption=product_name)
+
+                # URL 링크 출력
+                if product_url:
+                    st.markdown(f"[상품 페이지로 이동하기]({product_url})", unsafe_allow_html=True)
+                st.markdown("---")  # 구분선
+            else:
+                st.error("상품 데이터가 올바르지 않습니다.")  # 잘못된 형식의 데이터 처리
+    else:
+        st.write("찜한 상품이 없습니다.")  # 찜한 상품이 없을 때 메시지 표시
+
+
+
+
+
 # 마이페이지 UI
 def mypage():
     st.title("마이페이지")  # 페이지 제목 설정
@@ -53,9 +87,6 @@ def mypage():
         new_email = st.text_input("이메일", value=st.session_state['email'])
         new_phone_number = st.text_input("전화번호", value=st.session_state['phone_number'])
 
-
-
-
         if st.form_submit_button("정보 수정"):
             if update_user_info(new_email, new_phone_number):
                 st.session_state['email'] = new_email
@@ -64,13 +95,8 @@ def mypage():
             else:
                 st.error("정보 수정에 실패했습니다.")  # 실패 메시지 표시
 
-    # 찜한 상품 목록 섹션
-    st.header("찜한 상품 목록")
-    if st.session_state['wishlist']:
-        for product in st.session_state['wishlist']:
-            st.write(f"- {product}")
-    else:
-        st.write("찜한 상품이 없습니다.")  # 찜한 상품이 없을 때 메시지 표시
+    # 찜한 상품 목록 표시
+    display_wishlist()
 
     # 찜한 상품 모두 삭제 버튼
     if st.button("찜한 상품 모두 삭제"):
