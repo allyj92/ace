@@ -90,6 +90,7 @@ def mypage():
     with st.form(key='update_info'):
         # 로그인된 경우 세션에서 이메일과 전화번호를 불러오고, 로그아웃 상태일 경우 빈 값을 사용
         if st.session_state['logged_in']:
+            load_user_data()
             new_email = st.text_input("이메일", value=st.session_state.get('email', ''))
             new_phone_number = st.text_input("전화번호", value=st.session_state.get('phone_number', ''))
         else:
@@ -147,6 +148,9 @@ def login_page():
     if not st.session_state['logged_in']:
         username = st.text_input("아이디")
         password = st.text_input("비밀번호", type="password")
+        st.write(f"**아이디:** {st.session_state['username']}")
+        st.write(f"**이메일:** {st.session_state['email']}")
+        st.write(f"**전화번호:** {st.session_state['phone_number']}")
 
         if st.button("로그인"):
             login_data = {"username": username, "password": password}

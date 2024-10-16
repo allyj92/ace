@@ -8,6 +8,7 @@ import com.example.streamlit_integration.entity.WishlistItem;
 import com.example.streamlit_integration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,20 +43,23 @@ public class UserController {
 
     // 사용자 정보 조회 API (username으로 조회)
     @GetMapping("/{username}")
-    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
-        Optional<User> userOptional = userService.findUserByUsername(username);  // userRepository 대신 userService로 변경
+    public ResponseEntity<Map<String, Object>> getUserByUsername(@PathVariable String username) {
+        Optional<User> userOptional = userService.findUserByUsername(username);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            // 필요한 정보를 담아 반환
             Map<String, Object> userInfo = new HashMap<>();
             userInfo.put("username", user.getUsername());
             userInfo.put("email", user.getEmail());
             userInfo.put("phone_number", user.getPhoneNumber());
-            userInfo.put("wishlist", user.getWishlist());  // 사용자 찜 목록
+            userInfo.put("wishlist", user.getWishlist());
 
-            return ResponseEntity.ok(userInfo);
+            // Content-Type 명시적으로 설정
+            return ResponseEntity
+                    .ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(userInfo);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("사용자를 찾을 수 없습니다.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
 
