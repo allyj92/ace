@@ -47,8 +47,9 @@ def login_page():
             cookies.save()  # 쿠키 저장
             st.success("로그인 성공!")
             st.session_state['current_page'] = 'home'  # 로그인 성공 후 홈 페이지로 이동
-#             st.experimental_rerun()  # 로그인 후 페이지 새로고침
+#
         else:
+            st.session_state['logged_in'] = False 
             st.error(f"로그인 실패: {response.text}")  # 서버 응답 메시지 출력
 
 # 초기 세션 상태 설정
