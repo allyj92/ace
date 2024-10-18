@@ -1,5 +1,6 @@
 package com.example.streamlit_integration.dto;
 
+import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

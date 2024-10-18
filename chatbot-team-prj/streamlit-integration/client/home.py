@@ -12,6 +12,19 @@ import torch
 import os
 import requests
 
+# 세션 상태 초기화
+if 'logged_in' not in st.session_state:
+    st.session_state['logged_in'] = False  # 로그인 상태를 False로 초기화
+
+if 'username' not in st.session_state:
+    st.session_state['username'] = None  # username 값을 None으로 초기화
+
+if 'wishlist' not in st.session_state:
+    st.session_state['wishlist'] = []  # 찜한 상품 목록 초기화
+
+if 'products' not in st.session_state:
+    st.session_state['products'] = []  # 검색된 상품 결과 초기화
+
 
 def login_page():
     st.title("로그인")
@@ -20,12 +33,6 @@ def login_page():
     password = st.text_input("비밀번호", type="password")
 
     if st.button("로그인"):
-        def login_page():
-            st.title("로그인")
-
-            username = st.text_input("아이디")
-            password = st.text_input("비밀번호", type="password")
-
             if st.button("로그인"):
                 # POST 요청으로 데이터 전송
                 login_data = {"username": username, "password": password}
@@ -33,6 +40,7 @@ def login_page():
 
                 if response.status_code == 200:
                     st.session_state['logged_in'] = True  # 로그인 상태 세션에 저장
+                    st.session_state['username'] = username
                     st.success("로그인 성공!")
                 else:
                     st.session_state['logged_in'] = False  # 로그인 실패
@@ -50,7 +58,7 @@ torch.set_num_threads(1)
 reader = easyocr.Reader(['ko', 'en'], gpu=False)
 
 # 엑셀 파일에서 데이터 로드 함수
-@st.cache(ttl=9200)
+@st.cache_data(ttl=9200)
 def load_data():
     try:
         # 엑셀 파일에서 데이터 로드
@@ -109,11 +117,6 @@ def extract_cert_num(text):
     return cert_nums
 
 
-# 세션 상태 초기화
-if 'wishlist' not in st.session_state:
-    st.session_state['wishlist'] = []  # 찜한 상품 목록 저장
-if 'products' not in st.session_state:
-    st.session_state['products'] = []  # 검색된 상품 결과 저장
 
 
 # 서버로 찜 리스트를 저장하는 함수
@@ -139,24 +142,31 @@ def save_wishlist_to_server(wishlist, username):
 # 상품 찜하기 기능 (로그인 확인 추가)
 def add_to_wishlist(product):
 
-    # 로그 확인
-    st.write(f"찜하기 버튼 클릭됨: {product}")
-
 
     if not st.session_state['logged_in']:
         st.warning("로그인이 필요합니다.")
+        return  # 함수 종료, 더 이상 진행하지 않음
     else:
         # 상품 정보를 wishlist에 추가
         if not any(item['name'] == product['name'] for item in st.session_state['wishlist']):
             st.session_state['wishlist'].append(product)  # 찜 목록에 상품 추가
-            st.success(f"{product['name']}을(를) 찜 목록에 추가했습니다!")
+            error_message_container = st.empty()  # 경고 메시지를 표시할 컨테이너 생성
+            error_message_container.warning(f"{product['name']}을(를) 찜 목록에 추가했습니다!")  # 경고 메시지 표시
+            time.sleep(3)  # 3초 대기
+            error_message_container.empty()
+
+
         else:
-            st.warning(f"{product['name']}은(는) 이미 찜 목록에 있습니다.")
+            error_message_container = st.empty()  # 경고 메시지를 표시할 컨테이너 생성
+            error_message_container.warning(f"{product['name']}은(는) 이미 찜 목록에 있습니다.")  # 경고 메시지 표시
+            time.sleep(3)  # 3초 대기
+            error_message_container.empty()
 
 
 # 검색 결과를 표시하는 함수
 # 검색 결과를 표시하는 함수
 def display_search_results(similar_products):
+
     st.header("검색 결과")
     for i, row in similar_products.iterrows():
         product_name = row['제품명']
@@ -172,22 +182,22 @@ def display_search_results(similar_products):
         if 'wishlist' in st.session_state and any(item['name'] == product_name for item in st.session_state['wishlist']):
             st.write(f"{product_name}은(는) 이미 찜 목록에 추가되었습니다.")
         else:
-            # 찜하기 버튼과 해당 상품을 세션에 추가하는 함수 호출
-            if st.button(f"❤️ 찜하기", key=f"wishlist_{i}"):
-                product = {'name': product_name, 'image': product_image, 'url': product_url}
-                add_to_wishlist(product)  # 상품을 세션에 추가
-                with st.spinner("서버에 저장 중..."):
-                        save_wishlist_to_server(st.session_state['wishlist'], st.session_state['username'])
+             # ❤️ 찜하기 버튼을 생성하여 사용자가 상품을 찜할 수 있도록 함
+                    if st.button("❤️ 찜하기", key=f"wishlist_{i}"):
+                                product = {'name': product_name, 'image': product_image, 'url': product_url}
+                                add_to_wishlist(product)  # 상품을 세션에 추가
+                                with st.spinner("서버에 저장 중..."):
+                                    save_wishlist_to_server(st.session_state['wishlist'], st.session_state['username'])
 
-                st.experimental_rerun()
-                # 추가된 메시지 표시
-                st.success(f"'{product_name}'이(가) 찜 목록에 추가되었습니다!")
-        st.markdown("---")  # 구분선
+                                st.experimental_rerun()
 
 
+                    st.markdown("---")  # 구분선
 
 
-      
+
+
+
 
 
 # 링크 클릭 카운트 기능
@@ -260,17 +270,66 @@ if st.session_state.uploaded_file:
             similar_products = calculate_similarity(f"{v_value}V {a_value}A", df, 'V')
             if not similar_products.empty:
                 st.write(f"정격 출력 {v_value}V {a_value}A에 대한 유사 제품 검색 결과:")
-                for _, row in similar_products.iterrows():
+                for i, row in similar_products.iterrows():
                     product_name = row['제품명']
                     product_url = row.get('URL', 'URL 없음')
                     product_image = row.get('Image', None)
                     st.markdown(f"<h3 style='text-align: center;'>{product_name}</h3>", unsafe_allow_html=True)
 
+
+
+                    # CSS 스타일 정의 (버튼을 가운데로 정렬)
+                    st.markdown(
+                        """
+                        <style>
+                        .center-button {
+                            display: flex;
+                            justify-content: center;
+                            margin-top: 20px;
+                        }
+                        </style>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+                    # 찜하기 버튼을 가운데에 정렬
+                    col1, col2, col3 = st.columns([1,4,6])
+
+
+
+                    # 찜하기 버튼 추가
+                    if st.session_state['logged_in']:
+                        if 'username' in st.session_state:  # username이 존재하는지 확인
+                            with col2:  # 가운데 열에 버튼 추가
+                                if st.button("❤️ 찜하기", key=f"wishlist2-{i}"):
+                                    product = {'name': product_name, 'image': product_image, 'url': product_url}
+                                    add_to_wishlist(product)  # 찜하기 목록에 추가
+                                    with st.spinner("서버에 저장 중..."):
+                                        save_wishlist_to_server(st.session_state['wishlist'], st.session_state['username'])  # username 전달
+
+
+                        else:
+                            st.warning("사용자 정보를 찾을 수 없습니다.")
+                    else:
+
+                        if st.button("❤️ 찜하기", key=f"wishlist2-{i}"):  # 버튼 클릭
+                            error_message_container = st.empty()  # 경고 메시지를 표시할 컨테이너 생성
+                            error_message_container.warning("로그인이 필요합니다.")  # 경고 메시지 표시
+                            time.sleep(3)  # 3초 대기
+                            error_message_container.empty()
+
+
+
+
+
+
                     # 제품 이미지 표시
                     if product_image:
                         st.image(product_image, caption=product_name)
 
-                    # 제품 링크 및 찜하기 기능
+
+
+                    # 제품 링크
                     if product_url != 'URL 없음':
                         # Add CSS to style both the 링크 이동 and 찜하기 buttons
                         button_style = """
@@ -304,17 +363,15 @@ if st.session_state.uploaded_file:
                         st.markdown(button_style, unsafe_allow_html=True)
 
                         # Create a container for both buttons using HTML
-                        st.markdown(
-                            f"""
+                        st.markdown(f"""
                             <div style='text-align: center;'>
                                 <div class="button-container">
-                                    <a href="{product_url}" target="_blank" rel="noopener noreferrer" class="custom-button">📎 링크 이동</a>
-                                    <a href="#" class="custom-button" onclick="alert('찜하기 버튼 클릭됨!')">❤️ 찜하기</a>
+                                    <a href="{product_url}" target="_blank" rel="noopener noreferrer" class="custom-button">
+                                        📎 링크 이동
+                                    </a>
                                 </div>
                             </div>
-                            """,
-                            unsafe_allow_html=True
-                        )
+                            """, unsafe_allow_html=True)
                     else:
                         st.write(f"{product_name}에 대한 URL이 없습니다.")
 

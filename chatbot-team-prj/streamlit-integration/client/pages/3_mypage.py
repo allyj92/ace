@@ -36,7 +36,7 @@ def update_user_info(email, phone_number):
         "phone_number": phone_number
     }
     response = requests.put(f"{API_BASE_URL}/user/update", json=payload)
-    return response.status_code == 200  # 업데이트 성공 여부 반환
+    return response #response 객체를 반환
 
 # 찜한 상품 목록을 모두 삭제하는 함수
 def delete_all_wishlist():
@@ -99,12 +99,13 @@ def mypage():
 
         if st.form_submit_button("정보 수정"):
             if st.session_state['logged_in']:  # 로그인된 상태에서만 정보 수정 가능
-                if update_user_info(new_email, new_phone_number):
+                response = update_user_info(new_email, new_phone_number)
+                if response.status_code==200:
                     st.session_state['email'] = new_email
                     st.session_state['phone_number'] = new_phone_number
                     st.success("정보가 성공적으로 수정되었습니다!")  # 성공 메시지 표시
                 else:
-                    st.error("정보 수정에 실패했습니다.")  # 실패 메시지 표시
+                    st.error(f"정보 수정에 실패했습니다. 상태 코드: {response.status_code}, 응답 내용: {response.text}")  # 실패 메시지 표시 및 디버깅 정보 출력  # 실패 메시지 표시
             else:
                 st.error("로그인이 필요합니다.")  # 로그인되지 않은 상태에서는 수정 불가
 

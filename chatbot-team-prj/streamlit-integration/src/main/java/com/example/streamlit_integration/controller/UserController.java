@@ -5,6 +5,7 @@ import com.example.streamlit_integration.dto.WishlistRequest;
 import com.example.streamlit_integration.entity.Product;
 import com.example.streamlit_integration.entity.User;
 import com.example.streamlit_integration.entity.WishlistItem;
+import com.example.streamlit_integration.repository.UserRepository;
 import com.example.streamlit_integration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,21 +24,32 @@ import java.util.stream.Collectors;
 public class UserController {
 
     @Autowired
+    UserRepository userRepository;
+    @Autowired
     private UserService userService;
 
     // 사용자 정보 업데이트 API
     // 사용자 정보 업데이트 API
-    @PutMapping("/update")
-    public ResponseEntity<String> updateUser(@RequestBody UserDto userDto) {
-        // 디버깅용 로그 출력
-        System.out.println("Updating user: " + userDto.getUsername() + ", " + userDto.getEmail() + ", " + userDto.getPhoneNumber());
+    public boolean updateUser(UserDto userDto) {
+        Optional<User> userOptional = userRepository.findByUsername(userDto.getUsername());
 
-        boolean isUpdated = userService.updateUser(userDto);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
 
-        if (isUpdated) {
-            return ResponseEntity.ok("User updated successfully");
+            // Only update fields that are non-null
+            if (userDto.getEmail() != null) {
+                user.setEmail(userDto.getEmail());
+            }
+            if (userDto.getPhoneNumber() != null) {
+                user.setPhoneNumber(userDto.getPhoneNumber());
+            }
+
+            // Save the updated user back to the database
+            userRepository.save(user);
+            return true;
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update user");
+            System.out.println("User not found: " + userDto.getUsername());
+            return false;
         }
     }
 
@@ -89,5 +101,24 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
+    // 사용자 정보 부분 업데이트 API (PATCH)
+    @PatchMapping("/{username}")
+    public ResponseEntity<String> updateUserPartial(@PathVariable String username, @RequestBody UserDto userDto) {
+        // 디버깅용 로그 출력
+        System.out.println("Patching user: " + username + " with email: " + userDto.getEmail() + " and phone: " + userDto.getPhoneNumber());
+
+        boolean isUpdated = userService.updateUser(userDto);
+
+        if (isUpdated) {
+            return ResponseEntity.ok("User partially updated successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update user partially");
+        }
+    }
+
+
+
+
 
 }

@@ -8,7 +8,11 @@ import com.example.streamlit_integration.entity.WishlistItem;
 import com.example.streamlit_integration.repository.UserRepository;
 import com.example.streamlit_integration.repository.WishlistItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
@@ -71,32 +75,47 @@ public class UserService {
             return false;  // 저장 중 오류 발생 시 false 반환
         }
     }
+    /****************************************** 찜리스트        *******************************************/
 
     // 찜 리스트 저장 로직
     public boolean saveWishlist(String username, List<Product> wishlistProducts) {
-        Optional<User> userOpt = userRepository.findByUsername(username);
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            for (Product product : wishlistProducts) {
-                WishlistItem wishlistItem = new WishlistItem();
-                wishlistItem.setUser(user);
-                wishlistItem.setProduct(product);
-                wishlistItemRepository.save(wishlistItem);  // 찜 항목을 저장
+        try {
+            Optional<User> userOpt = userRepository.findByUsername(username);
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
+                if (wishlistProducts == null || wishlistProducts.isEmpty()) {
+                    System.out.println("찜 목록이 비어있습니다.");
+                    return false;
+                }
+                for (Product product : wishlistProducts) {
+                    if (product == null) {
+                        System.out.println("잘못된 제품 정보: null");
+                        continue; // 다음 제품으로 넘어감
+                    }
+                    WishlistItem wishlistItem = new WishlistItem();
+                    wishlistItem.setUser(user);
+                    wishlistItem.setProduct(product);
+                    wishlistItemRepository.save(wishlistItem);  // 찜 항목을 저장
+                }
+                return true;
             }
-            return true;
+        } catch (Exception e) {
+            System.out.println("찜 리스트 저장 중 오류 발생: " + e.getMessage());
+            e.printStackTrace(); // 콘솔에 스택 트레이스 출력
         }
         return false;
     }
 
-    // 찜 리스트 불러오기 로직
+
     public List<WishlistItem> getWishlist(String username) {
-        Optional<User> userOpt = userRepository.findByUsername(username);  // findByUsername으로 사용자 검색
+        Optional<User> userOpt = userRepository.findByUsername(username); // Ensure this method is defined
         if (userOpt.isPresent()) {
-            User user = userOpt.get();  // Optional에서 User 객체 가져오기
-            return wishlistItemRepository.findByUser(user);  // User 객체를 전달하여 사용자별 찜 리스트 반환
+            User user = userOpt.get();
+            return wishlistItemRepository.findByUser(user); // This should return List<WishlistItem>
         }
-        return null;
+        return null; // Or consider throwing an exception or returning an empty list
     }
+
 
     /*************************     Read 부분       **************************/
     // 사용자명으로 사용자 조회
@@ -110,21 +129,30 @@ public class UserService {
     }
 
     /*************************     Update 부분       **************************/
-    // 사용자 정보 업데이트
     public boolean updateUser(UserDto userDto) {
-        // 사용자명으로 사용자 정보 조회
-        Optional<User> userOpt = userRepository.findByUsername(userDto.getUsername());
+        try {
+            Optional<User> userOptional = userRepository.findByUsername(userDto.getUsername());
 
-        // 사용자가 존재하는 경우 정보 업데이트
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();  // 기존 사용자 정보 가져오기
-            user.setEmail(userDto.getEmail());  // 이메일 업데이트
-            user.setPhoneNumber(userDto.getPhoneNumber());  // 전화번호 업데이트
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
 
-            userRepository.save(user);  // 수정된 사용자 정보 DB에 저장
-            return true;  // 업데이트 성공 시 true 반환
+                if (userDto.getEmail() != null) {
+                    user.setEmail(userDto.getEmail());
+                }
+                if (userDto.getPhoneNumber() != null) {
+                    user.setPhoneNumber(userDto.getPhoneNumber());
+                }
+
+                userRepository.save(user);
+                return true;
+            } else {
+                System.out.println("User not found: " + userDto.getUsername());
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
-        return false;  // 사용자가 없으면 업데이트 실패
     }
 
     /*************************     Delete 부분       **************************/
@@ -140,4 +168,8 @@ public class UserService {
         }
         return false;  // 사용자가 없으면 삭제 실패
     }
+
+
 }
+
+
