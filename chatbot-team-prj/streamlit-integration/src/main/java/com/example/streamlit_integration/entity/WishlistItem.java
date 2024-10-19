@@ -24,7 +24,7 @@ public class WishlistItem {
     @JoinColumn(name = "user_id")
     private User user;  // 찜한 사용자
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "product_id")
     private Product product;  // 찜한 상품
 

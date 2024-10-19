@@ -16,6 +16,19 @@ if 'phone_number' not in st.session_state:
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False  # 로그인 상태 초기화
 
+ # 서버에서 유저의 찜 리스트를 불러오는 함수 (정의된 위치 확인)
+def load_wishlist_from_server(username):
+        url = f"http://localhost:8080/user/{username}/wishlist"  # 유저의 찜 리스트를 불러오는 API 엔드포인트
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                st.session_state['wishlist'] = response.json()  # 서버에서 받은 찜 리스트를 세션에 저장
+            else:
+                st.error(f"찜 리스트를 불러오는 데 실패했습니다: {response.text}")
+        except Exception as e:
+            st.error(f"불러오는 중 오류가 발생했습니다: {e}")
+
+
 # 서버에서 사용자 정보와 찜한 상품 목록을 가져오는 함수
 def load_user_data():
     response = requests.get(f"{API_BASE_URL}/user/{st.session_state['username']}")
@@ -24,7 +37,10 @@ def load_user_data():
         st.session_state['username'] = user_data['username']  # 사용자명 설정
         st.session_state['email'] = user_data['email']  # 이메일 설정
         st.session_state['phone_number'] = user_data['phone_number']  # 전화번호 설정
-        st.session_state['wishlist'] = user_data['wishlist']  # 찜한 상품 목록 설정
+        if 'wishlist' in user_data:
+            st.session_state['wishlist'] = user_data['wishlist']  # 찜한 상품 목록 설정
+        else:
+            load_wishlist_from_server(st.session_state['username'])  # 별도의 wishlist API 호출
     else:
         st.error("사용자 정보를 불러오는 데 실패했습니다.")  # API 호출 실패 시 에러 메시지
 
@@ -47,8 +63,13 @@ def delete_all_wishlist():
 def display_wishlist():
     st.header("찜한 상품 목록")
 
+    # 찜 리스트를 세션에서 가져오기 전에 서버에서 찜 리스트를 불러옴
+    if 'username' in st.session_state and st.session_state['username']:
+       load_wishlist_from_server(st.session_state['username'])  # 서버에서 찜 리스트를 불러오기
+
     # wishlist가 있는지 확인
     if st.session_state['wishlist']:
+
         # wishlist의 각 상품을 순회하며 처리
         for product in st.session_state['wishlist']:
             if isinstance(product, dict):
@@ -121,16 +142,12 @@ def mypage():
             st.error("찜한 상품 삭제에 실패했습니다.")  # 실패 메시지
 
     # 서버에서 유저의 찜 리스트를 불러오는 함수
-    def load_wishlist_from_server(username):
-        url = f"http://localhost:8080/user/{username}/wishlist"  # 유저의 찜 리스트를 불러오는 API 엔드포인트
-        try:
-            response = requests.get(url)
-            if response.status_code == 200:
-                st.session_state['wishlist'] = response.json()  # 서버에서 받은 찜 리스트를 세션에 저장
-            else:
-                st.error(f"찜 리스트를 불러오는 데 실패했습니다: {response.text}")
-        except Exception as e:
-            st.error(f"불러오는 중 오류가 발생했습니다: {e}")
+    # 로그인 후 유저의 찜 리스트 불러오기
+    def load_wishlist_after_login(username):
+        load_user_data()  # 사용자 정보 로드
+        load_wishlist_from_server(username)  # 찜한 상품 리스트 로드
+
+
 
     # 로그인 후 유저의 찜 리스트 불러오기
     if 'logged_in' in st.session_state and st.session_state['logged_in']:

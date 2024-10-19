@@ -5,6 +5,7 @@ import com.example.streamlit_integration.dto.UserDto;
 import com.example.streamlit_integration.entity.Product;
 import com.example.streamlit_integration.entity.User;
 import com.example.streamlit_integration.entity.WishlistItem;
+import com.example.streamlit_integration.repository.ProductDocumentRepository;
 import com.example.streamlit_integration.repository.UserRepository;
 import com.example.streamlit_integration.repository.WishlistItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +24,9 @@ public class UserService {
 
     @Autowired  // 의존성 주입으로 UserRepository를 자동으로 연결
     private UserRepository userRepository;
+
+    @Autowired
+    ProductDocumentRepository productDocumentRepository;
 
     @Autowired
     private WishlistItemRepository wishlistItemRepository;
@@ -78,6 +83,7 @@ public class UserService {
     /****************************************** 찜리스트        *******************************************/
 
     // 찜 리스트 저장 로직
+    @Transactional
     public boolean saveWishlist(String username, List<Product> wishlistProducts) {
         try {
             Optional<User> userOpt = userRepository.findByUsername(username);
@@ -92,6 +98,12 @@ public class UserService {
                         System.out.println("잘못된 제품 정보: null");
                         continue; // 다음 제품으로 넘어감
                     }
+
+                    // Product가 저장되어 있지 않으면 먼저 저장
+                    if (product.getId() == null) {
+                        product = productDocumentRepository.save(product);  // Product를 먼저 저장
+                    }
+
                     WishlistItem wishlistItem = new WishlistItem();
                     wishlistItem.setUser(user);
                     wishlistItem.setProduct(product);
