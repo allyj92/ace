@@ -15,6 +15,19 @@ if not cookies.ready():
 # 홈 페이지 함수
 def home_page():
     st.title("로그인")
+    st.markdown(
+            """
+            <style>
+            .underline {
+                border-bottom: 2px solid #e3e3e3;  /* 밑줄 스타일 (검정색, 두께 2px) */
+                padding-bottom: 10px;  /* 제목과 밑줄 사이 간격 */
+                margin-bottom: 20px;  /* 밑줄과 콘텐츠 사이 간격 */
+            }
+            </style>
+            <div class="underline"> </div>
+            """,
+            unsafe_allow_html=True
+        )
     st.write(f"로그인에 성공했습니다, {st.session_state['username']}님 반갑습니다.")
 
     # 로그아웃 버튼
@@ -29,6 +42,19 @@ def home_page():
 # 로그인 페이지 함수
 def login_page():
     st.title("로그인")
+    st.markdown(
+            """
+            <style>
+            .underline {
+                border-bottom: 2px solid #e3e3e3;  /* 밑줄 스타일 (검정색, 두께 2px) */
+                padding-bottom: 10px;  /* 제목과 밑줄 사이 간격 */
+                margin-bottom: 20px;  /* 밑줄과 콘텐츠 사이 간격 */
+            }
+            </style>
+            <div class="underline"> </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     # 로그인 입력 필드
     username = st.text_input("아이디")

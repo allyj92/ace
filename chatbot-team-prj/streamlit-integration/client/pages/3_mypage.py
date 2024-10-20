@@ -20,6 +20,19 @@ if 'phoneNumber' not in st.session_state:
 
 # 마이페이지 UI
 st.title("마이페이지")
+st.markdown(
+        """
+        <style>
+        .underline {
+            border-bottom: 2px solid #e3e3e3;  /* 밑줄 스타일 (검정색, 두께 2px) */
+            padding-bottom: 10px;  /* 제목과 밑줄 사이 간격 */
+            margin-bottom: 20px;  /* 밑줄과 콘텐츠 사이 간격 */
+        }
+        </style>
+        <div class="underline"> </div>
+        """,
+        unsafe_allow_html=True
+    )
 st.header("나의 정보 수정")
 
 with st.form(key='update_info_form'):

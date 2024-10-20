@@ -3,6 +3,19 @@ import requests
 
 def signup_page():
     st.title("회원가입")
+    st.markdown(
+            """
+            <style>
+            .underline {
+                border-bottom: 2px solid #e3e3e3;  /* 밑줄 스타일 (검정색, 두께 2px) */
+                padding-bottom: 10px;  /* 제목과 밑줄 사이 간격 */
+                margin-bottom: 20px;  /* 밑줄과 콘텐츠 사이 간격 */
+            }
+            </style>
+            <div class="underline"> </div>
+            """,
+            unsafe_allow_html=True
+        )
 
     st.write("회원가입을 하시면 맞춤형 제품 추천을 더 빠르게 받을 수 있어요!")
 

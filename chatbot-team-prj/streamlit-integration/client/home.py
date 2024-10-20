@@ -263,6 +263,24 @@ if st.session_state.uploaded_file:
             similar_products = calculate_similarity(f"{v_value}V {a_value}A", df, 'V')
             if not similar_products.empty:
                 st.write(f"정격 출력 {v_value}V {a_value}A에 대한 유사 제품 검색 결과:")
+
+
+                st.markdown(
+                        """
+                        <style>
+                        .underline {
+                            border-bottom: 2px solid #e3e3e3;  /* 밑줄 스타일 (검정색, 두께 2px) */
+                            padding-bottom: 10px;  /* 제목과 밑줄 사이 간격 */
+                            margin-bottom: 20px;  /* 밑줄과 콘텐츠 사이 간격 */
+                        }
+                        </style>
+                        <div class="underline"> </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
+
+
+
                 for i, row in similar_products.iterrows():
                     product_name = row['제품명']
                     product_url = row.get('URL', 'URL 없음')

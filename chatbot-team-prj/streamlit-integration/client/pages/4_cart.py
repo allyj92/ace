@@ -9,7 +9,20 @@ if 'wishlist' not in st.session_state:
 
 # 찜한 상품 목록 표시 섹션
 def display_wishlist():
-    st.header("찜한 상품 목록")
+    st.header("장바구니")
+    st.markdown(
+        """
+        <style>
+        .underline {
+            border-bottom: 2px solid #e3e3e3;  /* 밑줄 스타일 (검정색, 두께 2px) */
+            padding-bottom: 10px;  /* 제목과 밑줄 사이 간격 */
+            margin-bottom: 20px;  /* 밑줄과 콘텐츠 사이 간격 */
+        }
+        </style>
+        <div class="underline"> </div>
+        """,
+        unsafe_allow_html=True
+    )
 
     # 세션에서 wishlist가 있는지 확인
     if st.session_state['wishlist']:
