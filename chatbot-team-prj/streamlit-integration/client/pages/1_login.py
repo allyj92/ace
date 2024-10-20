@@ -5,12 +5,22 @@ from streamlit_cookies_manager import EncryptedCookieManager
 # 쿠키 매니저 초기화
 cookies = EncryptedCookieManager(
     prefix="myapp",  # 애플리케이션 고유의 쿠키 이름
-    password="your_password_key"  # 쿠키 암호화에 사용할 비밀번호
+    password="3511"  # 쿠키 암호화에 사용할 비밀번호
 )
+
 
 # 만약 쿠키를 사용할 수 없으면 경고
 if not cookies.ready():
     st.stop()
+
+# 로그인 상태 확인 및 세션 상태 초기화
+if 'logged_in' not in st.session_state:
+    if cookies.get('logged_in') == 'true':
+        st.session_state['logged_in'] = True
+        st.session_state['username'] = cookies.get('username', '')
+    else:
+        st.session_state['logged_in'] = False
+
 
 # 홈 페이지 함수
 def home_page():
