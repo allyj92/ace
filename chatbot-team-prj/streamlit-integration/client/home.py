@@ -146,8 +146,6 @@ def save_wishlist_to_server(wishlist, username):
 
 # 상품 찜하기 기능 (로그인 확인 추가)
 def add_to_wishlist(product):
-
-
     if not st.session_state['logged_in']:
         st.warning("로그인이 필요합니다.")
         return  # 함수 종료, 더 이상 진행하지 않음
@@ -156,15 +154,13 @@ def add_to_wishlist(product):
         if not any(item['name'] == product['name'] for item in st.session_state['wishlist']):
             st.session_state['wishlist'].append(product)  # 찜 목록에 상품 추가
             error_message_container = st.empty()  # 경고 메시지를 표시할 컨테이너 생성
-            error_message_container.warning(f"{product['name']}을(를) 찜 목록에 추가했습니다!")  # 경고 메시지 표시
-            time.sleep(3)  # 3초 대기
+            error_message_container.warning(f"{product['name']}을(를) cart에 추가했습니다!")  # 경고 메시지 표시
+            time.sleep(2)  # 시간을 충분히 주어 메시지가 표시되도록 함
             error_message_container.empty()
-
-
         else:
             error_message_container = st.empty()  # 경고 메시지를 표시할 컨테이너 생성
-            error_message_container.warning(f"{product['name']}은(는) 이미 찜 목록에 있습니다.")  # 경고 메시지 표시
-            time.sleep(3)  # 3초 대기
+            error_message_container.warning(f"{product['name']}은(는) 이미 cart에 있습니다.")  # 경고 메시지 표시
+            time.sleep(2)  # 시간을 충분히 주어 메시지가 표시되도록 함
             error_message_container.empty()
 st.write("세션 상태 (디버깅):", st.session_state)
 
@@ -184,17 +180,18 @@ def display_search_results(similar_products):
             st.image(product_image, caption=product_name)
 
         # 버튼 상태 확인: 세션에 저장된 찜 목록에 포함된 상품인지 확인
-        if 'wishlist' in st.session_state and any(item['name'] == product_name for item in st.session_state['wishlist']):
-            st.write(f"{product_name}은(는) 이미 찜 목록에 추가되었습니다.")
+        if any(item['name'] == product_name for item in st.session_state['wishlist']):
+                    st.write(f"{product_name}은(는) 이미 찜 목록에 추가되었습니다.")
         else:
              # ❤️ 찜하기 버튼을 생성하여 사용자가 상품을 찜할 수 있도록 함
                     if st.button("❤️ 찜하기", key=f"wishlist_{i}"):
                                 product = {'name': product_name, 'image': product_image, 'url': product_url}
                                 add_to_wishlist(product)  # 상품을 세션에 추가
-                                with st.spinner("서버에 저장 중..."):
-                                    save_wishlist_to_server(st.session_state['wishlist'], st.session_state['username'])
+#                                 with st.spinner("서버에 저장 중..."):
+#                                     save_wishlist_to_server(st.session_state['wishlist'], st.session_state['username'])
 
-                                st.experimental_rerun()
+                                time.sleep(3)
+
 
 
                     st.markdown("---")  # 구분선
@@ -259,11 +256,10 @@ if st.session_state.uploaded_file:
     # 인증번호가 없을 경우 V/A 검색
     if not cert_nums:
         st.write("**🤖 챗봇:** 인증번호로 제품을 찾기 어렵습니다. 정격출력 V/A 값을 기반으로 검색을 진행합니다...")
-        time.sleep(3)
         similar_products = None  # Initialize to None
         if v_value and a_value:
             with st.spinner("정격출력 V/A 검색 중입니다. 잠시만 기다려주세요..."):
-                time.sleep(3)
+                pass
             similar_products = calculate_similarity(f"{v_value}V {a_value}A", df, 'V')
             if not similar_products.empty:
                 st.write(f"정격 출력 {v_value}V {a_value}A에 대한 유사 제품 검색 결과:")
@@ -299,9 +295,11 @@ if st.session_state.uploaded_file:
                         if 'username' in st.session_state:  # username이 존재하는지 확인
                             with col2:  # 가운데 열에 버튼 추가
                                 if st.button("❤️ 찜하기", key=f"wishlist2-{i}"):
+                                    time.sleep(2)
                                     st.write("현재 세션 상태에서 찜한 상품 목록 (디버깅):", st.session_state['wishlist'])
                                     product = {'name': product_name, 'image': product_image, 'url': product_url}
                                     add_to_wishlist(product)  # 찜하기 목록에 추가
+
 #                                     with st.spinner("서버에 저장 중..."):
 #                                         save_wishlist_to_server(st.session_state['wishlist'], st.session_state['username'])  # username 전달
 
@@ -313,7 +311,6 @@ if st.session_state.uploaded_file:
                         if st.button("❤️ 찜하기", key=f"wishlist2-{i}"):  # 버튼 클릭
                             error_message_container = st.empty()  # 경고 메시지를 표시할 컨테이너 생성
                             error_message_container.warning("로그인이 필요합니다.")  # 경고 메시지 표시
-                            time.sleep(3)  # 3초 대기
                             error_message_container.empty()
 
 

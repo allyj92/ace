@@ -47,3 +47,14 @@ def display_wishlist():
 
 # 찜한 상품 목록 표시 함수 호출
 display_wishlist()
+
+if st.button("찜한 상품 모두 삭제"):
+        if delete_all_wishlist():
+            st.session_state['wishlist'].clear()
+            st.success("찜한 상품이 모두 삭제되었습니다.")
+        else:
+            st.error("찜한 상품 삭제에 실패했습니다.")
+
+if st.button("로그아웃"):
+        st.session_state.clear()
+        st.session_state['logged_in'] = False
