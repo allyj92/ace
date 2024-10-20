@@ -13,6 +13,11 @@ import os
 import requests
 
 # 세션 상태 초기화
+# 세션 상태 초기화
+if 'uploaded_file' not in st.session_state:
+    st.session_state['uploaded_file'] = None  # 'uploaded_file'을 초기화
+
+
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False  # 로그인 상태를 False로 초기화
 
@@ -161,7 +166,7 @@ def add_to_wishlist(product):
             error_message_container.warning(f"{product['name']}은(는) 이미 찜 목록에 있습니다.")  # 경고 메시지 표시
             time.sleep(3)  # 3초 대기
             error_message_container.empty()
-
+st.write("세션 상태 (디버깅):", st.session_state)
 
 # 검색 결과를 표시하는 함수
 # 검색 결과를 표시하는 함수
@@ -212,15 +217,7 @@ def count_click(product_name):
 
 st.image('logo.jpg' ,width=500)
 
-# 세션 상태 초기화
-if 'cert_num_confirmed' not in st.session_state:
-    st.session_state.cert_num_confirmed = False
-if 'uploaded_file' not in st.session_state:
-    st.session_state.uploaded_file = None
-if 'wishlist' not in st.session_state:
-    st.session_state.wishlist = []
-if 'click_counts' not in st.session_state:
-    st.session_state.click_counts = {}
+
 
 # 데이터 로드
 df = load_data()
@@ -302,10 +299,11 @@ if st.session_state.uploaded_file:
                         if 'username' in st.session_state:  # username이 존재하는지 확인
                             with col2:  # 가운데 열에 버튼 추가
                                 if st.button("❤️ 찜하기", key=f"wishlist2-{i}"):
+                                    st.write("현재 세션 상태에서 찜한 상품 목록 (디버깅):", st.session_state['wishlist'])
                                     product = {'name': product_name, 'image': product_image, 'url': product_url}
                                     add_to_wishlist(product)  # 찜하기 목록에 추가
-                                    with st.spinner("서버에 저장 중..."):
-                                        save_wishlist_to_server(st.session_state['wishlist'], st.session_state['username'])  # username 전달
+#                                     with st.spinner("서버에 저장 중..."):
+#                                         save_wishlist_to_server(st.session_state['wishlist'], st.session_state['username'])  # username 전달
 
 
                         else:
