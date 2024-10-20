@@ -17,4 +17,13 @@ public class UserDto {
     private String email;
     private String address;
     private String phoneNumber;
+
+    @Override
+    public String toString() {
+        return "UserDto{" +
+                "email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                '}';
+    }
 }
+

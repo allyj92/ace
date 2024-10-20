@@ -142,29 +142,13 @@ public class UserService {
 
     /*************************     Update 부분       **************************/
     public boolean updateUser(UserDto userDto) {
-        try {
-            Optional<User> userOptional = userRepository.findByUsername(userDto.getUsername());
-
-            if (userOptional.isPresent()) {
-                User user = userOptional.get();
-
-                if (userDto.getEmail() != null) {
-                    user.setEmail(userDto.getEmail());
-                }
-                if (userDto.getPhoneNumber() != null) {
-                    user.setPhoneNumber(userDto.getPhoneNumber());
-                }
-
-                userRepository.save(user);
-                return true;
-            } else {
-                System.out.println("User not found: " + userDto.getUsername());
-                return false;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        return userRepository.findByUsername(userDto.getUsername())
+                .map(user -> {
+                    if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
+                    if (userDto.getPhoneNumber() != null) user.setPhoneNumber(userDto.getPhoneNumber());
+                    userRepository.save(user);
+                    return true;
+                }).orElse(false);
     }
 
     /*************************     Delete 부분       **************************/

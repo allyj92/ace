@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,17 +104,33 @@ public class UserController {
     }
 
     // 사용자 정보 부분 업데이트 API (PATCH)
-    @PatchMapping("/{username}")
+
+    @Transactional  // 트랜잭션 어노테이션 추가
+    @PutMapping("/{username}/update")
     public ResponseEntity<String> updateUserPartial(@PathVariable String username, @RequestBody UserDto userDto) {
-        // 디버깅용 로그 출력
-        System.out.println("Patching user: " + username + " with email: " + userDto.getEmail() + " and phone: " + userDto.getPhoneNumber());
+        // 입력된 데이터 로그
+        System.out.println("Received request to update user: " + username);
+        System.out.println("Data received -> email: " + userDto.getEmail() + ", phone: " + userDto.getPhoneNumber());
 
-        boolean isUpdated = userService.updateUser(userDto);
+        try {
+            // userService 호출 전에 디버깅 로그 추가
+            System.out.println("Calling userService.updateUser with data: " + userDto.toString());
 
-        if (isUpdated) {
-            return ResponseEntity.ok("User partially updated successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update user partially");
+            boolean isUpdated = userService.updateUser(userDto);
+
+            // userService 메서드 결과 로그
+            if (isUpdated) {
+                System.out.println("User update successful for user: " + username);
+                return ResponseEntity.ok("User partially updated successfully");
+            } else {
+                System.out.println("User update failed for user: " + username);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update user partially");
+            }
+        } catch (Exception e) {
+            // 예외가 발생한 경우 로그에 에러 출력
+            System.err.println("Error while updating user: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while updating user");
         }
     }
 

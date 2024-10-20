@@ -187,11 +187,11 @@ def display_search_results(similar_products):
                     if st.button("❤️ 찜하기", key=f"wishlist_{i}"):
                                 product = {'name': product_name, 'image': product_image, 'url': product_url}
                                 add_to_wishlist(product)  # 상품을 세션에 추가
-#                                 with st.spinner("서버에 저장 중..."):
-#                                     save_wishlist_to_server(st.session_state['wishlist'], st.session_state['username'])
+                                with st.spinner("서버에 저장 중..."):
+                                    save_wishlist_to_server(st.session_state['wishlist'], st.session_state['username'])
 
                                 time.sleep(3)
-
+                                st.experimental_rerun()
 
 
                     st.markdown("---")  # 구분선
