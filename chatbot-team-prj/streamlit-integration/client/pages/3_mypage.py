@@ -27,9 +27,6 @@ st.write("세션 상태 디버깅:", st.session_state)
 # 서버 URL 설정 (REST API 서버 주소 설정)
 API_BASE_URL = "http://localhost:8080"
 
-# 세션 상태 초기화
-if 'logged_in' not in st.session_state:
-    st.session_state['logged_in'] = False  # 로그인 상태 초기화
 
 if 'username' not in st.session_state:
     st.session_state['username'] = ''  # 사용자명 초기화
@@ -51,13 +48,14 @@ if not st.session_state['logged_in']:
         response = requests.post(f"{API_BASE_URL}/auth/login", json=login_data)
 
         if response.status_code == 200:
-            st.success("로그인 성공!")
             st.session_state['logged_in'] = True
-            cookies['logged_in'] = 'true'
             st.session_state['username'] = username
+            cookies['logged_in'] = 'true'
+            cookies['username'] = username
             cookies.save()  # 쿠키 저장
             st.success("로그인 성공!")
             st.session_state['current_page'] = 'home'
+            st.experimental_rerun()
 
             # 로그인 성공 후 사용자 정보를 다시 가져옴
             response = requests.get(f"{API_BASE_URL}/user/{username}")
@@ -68,7 +66,7 @@ if not st.session_state['logged_in']:
             else:
                 st.error(f"사용자 정보를 가져오는 데 실패했습니다: {response.status_code}")
         else:
-            st.error("로그인 실패: 아이디 또는 비밀번호를 확인하세요.")
+            st.error(f"로그인 실패: 아이디 또는 비밀번호를 확인하세요. (상태 코드: {response.status_code})")
 else:
     # 로그인된 경우 마이페이지 UI 표시
     st.title("마이페이지")
