@@ -1,5 +1,6 @@
 package com.example.streamlit_integration.entity;
 
+import com.example.streamlit_integration.dto.QuestionDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -51,5 +52,16 @@ public class Question {
     @PreUpdate
     protected void onUpdate() {
         updatedDate = LocalDateTime.now();
+    }
+
+    public Question (QuestionDto req, User user){
+        this.user = user;
+        this.title = req.getTitle();
+        this.content = req.getContent();
+    }
+
+    public void update(QuestionDto req){
+        this.title = req.getTitle();
+        this.content = req.getContent();
     }
 }
