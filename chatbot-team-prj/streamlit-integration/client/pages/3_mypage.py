@@ -21,8 +21,7 @@ if 'logged_in' not in st.session_state:
     else:
         st.session_state['logged_in'] = False
 
-# 세션 상태 디버깅 출력
-st.write("세션 상태 디버깅:", st.session_state)
+
 
 # 서버 URL 설정 (REST API 서버 주소 설정)
 API_BASE_URL = "http://localhost:8080"

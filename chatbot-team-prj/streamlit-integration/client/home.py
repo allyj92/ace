@@ -162,7 +162,7 @@ def add_to_wishlist(product):
             error_message_container.warning(f"{product['name']}은(는) 이미 cart에 있습니다.")  # 경고 메시지 표시
             time.sleep(2)  # 시간을 충분히 주어 메시지가 표시되도록 함
             error_message_container.empty()
-st.write("세션 상태 (디버깅):", st.session_state)
+
 
 # 검색 결과를 표시하는 함수
 # 검색 결과를 표시하는 함수
@@ -314,7 +314,6 @@ if st.session_state.uploaded_file:
                             with col2:  # 가운데 열에 버튼 추가
                                 if st.button("❤️ 찜하기", key=f"wishlist2-{i}"):
                                     time.sleep(2)
-                                    st.write("현재 세션 상태에서 찜한 상품 목록 (디버깅):", st.session_state['wishlist'])
                                     product = {'name': product_name, 'image': product_image, 'url': product_url}
                                     add_to_wishlist(product)  # 찜하기 목록에 추가
 
@@ -329,6 +328,7 @@ if st.session_state.uploaded_file:
                         if st.button("❤️ 찜하기", key=f"wishlist2-{i}"):  # 버튼 클릭
                             error_message_container = st.empty()  # 경고 메시지를 표시할 컨테이너 생성
                             error_message_container.warning("로그인이 필요합니다.")  # 경고 메시지 표시
+                            time.sleep(2)
                             error_message_container.empty()
 
 

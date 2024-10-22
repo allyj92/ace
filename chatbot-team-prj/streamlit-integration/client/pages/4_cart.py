@@ -53,10 +53,7 @@ def display_wishlist():
     else:
         st.write("찜한 상품이 없습니다.")
 
-    # 세션 상태의 wishlist를 별도로 표시 (디버깅용)
-    st.subheader("세션에 저장된 찜한 상품 목록")
-    for item in st.session_state['wishlist']:
-        st.write(f"상품명: {item.get('name', '이름 없음')}, URL: {item.get('url', 'URL 없음')}")
+
 
 # 찜한 상품 목록 표시 함수 호출
 display_wishlist()
