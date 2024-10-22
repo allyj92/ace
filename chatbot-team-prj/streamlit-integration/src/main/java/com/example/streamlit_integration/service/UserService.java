@@ -7,7 +7,7 @@ import com.example.streamlit_integration.entity.User;
 import com.example.streamlit_integration.entity.WishlistItem;
 import com.example.streamlit_integration.repository.ProductRepository;
 import com.example.streamlit_integration.repository.UserRepository;
-import com.example.streamlit_integration.repository.WishlistItemRepository;
+import com.example.streamlit_integration.repository.WishlistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class UserService {
     ProductRepository productRepository;
 
     @Autowired
-    private WishlistItemRepository wishlistItemRepository;
+    private WishlistRepository wishlistRepository;
 
     /*************************     로그인 부분       **************************/
     // 로그인 처리 메서드
@@ -103,7 +103,7 @@ public class UserService {
                     WishlistItem wishlistItem = new WishlistItem();
                     wishlistItem.setUser(user);
                     wishlistItem.setProduct(product);
-                    wishlistItemRepository.save(wishlistItem);  // 찜 항목을 저장
+                    wishlistRepository.save(wishlistItem);  // 찜 항목을 저장
                 }
                 return true;
             }
@@ -119,9 +119,23 @@ public class UserService {
         Optional<User> userOpt = userRepository.findByUsername(username); // Ensure this method is defined
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            return wishlistItemRepository.findByUser(user); // This should return List<WishlistItem>
+            return wishlistRepository.findByUser(user); // This should return List<WishlistItem>
         }
         return null; // Or consider throwing an exception or returning an empty list
+    }
+
+    // 찜한 상품 모두 삭제
+    public boolean deleteAllWishlistItems(String username) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            // 해당 사용자의 모든 찜 리스트를 삭제
+            wishlistRepository.deleteAllByUser(user);
+            return true;
+        } else {
+            return false;
+        }
     }
 
 

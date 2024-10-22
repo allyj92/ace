@@ -207,20 +207,24 @@ def extract_cert_num(text):
 
 # 서버로 찜 리스트를 저장하는 함수
 def save_wishlist_to_server(wishlist, username):
-    url = "http://localhost:8080/user/wishlist"  # 서버에 저장하는 API 엔드포인트
+    url = "http://localhost:8080/user/wishlist"
     data = {
         "username": username,
-        "wishlist": wishlist  # 찜한 상품 리스트를 서버로 전송
+        "wishlist": wishlist
     }
+
+
     try:
         response = requests.post(url, json=data)
+        st.write(f"응답 상태 코드: {response.status_code}")
+        st.write(f"응답 내용: {response.text}")
+
         if response.status_code == 200:
             st.success("찜 리스트가 성공적으로 저장되었습니다.")
         else:
             st.error(f"서버 오류: {response.text}")
     except Exception as e:
         st.error(f"저장 중 오류가 발생했습니다: {e}")
-
 
 
 
@@ -416,8 +420,8 @@ if st.session_state.uploaded_file:
                                     product = {'name': product_name, 'image': product_image, 'url': product_url}
                                     add_to_wishlist(product)  # 찜하기 목록에 추가
 
-#                                     with st.spinner("서버에 저장 중..."):
-#                                         save_wishlist_to_server(st.session_state['wishlist'], st.session_state['username'])  # username 전달
+                                    with st.spinner("서버에 저장 중..."):
+                                        save_wishlist_to_server(st.session_state['wishlist'], st.session_state['username'])  # username 전달
 
 
                         else:

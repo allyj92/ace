@@ -1,5 +1,6 @@
 package com.example.streamlit_integration.controller;
 
+
 import com.example.streamlit_integration.dto.UserDto;
 import com.example.streamlit_integration.dto.WishlistRequest;
 import com.example.streamlit_integration.entity.Product;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+@CrossOrigin(origins = "http://localhost:8501")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -78,17 +79,17 @@ public class UserController {
 
     // 찜 리스트 저장 API
     @PostMapping("/wishlist")
-    public ResponseEntity<?> saveWishlist(@RequestBody WishlistRequest request) {
-        boolean success = userService.saveWishlist(request.getUsername(), request.getWishlist());
-        if (success) {
-            return ResponseEntity.ok("찜 리스트가 저장되었습니다.");
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("찜 리스트 저장 실패");
-        }
+    public ResponseEntity<String> saveWishlist(@RequestBody WishlistRequest request) {
+        String username = request.getUsername();
+        List<Product> wishlist = request.getWishlist();
+
+        // 찜한 상품 처리 로직
+
+        return ResponseEntity.ok("찜 리스트 저장 성공");
     }
 
     // 유저의 찜 리스트 불러오기 API
-    @GetMapping("/{username}/wishlist")
+    @GetMapping("user/{username}/wishlist")
     public ResponseEntity<List<Product>> getWishlist(@PathVariable String username) {
         List<WishlistItem> wishlistItems = userService.getWishlist(username);  // WishlistItem 리스트를 가져옴
         if (wishlistItems != null) {
@@ -100,6 +101,24 @@ public class UserController {
             return ResponseEntity.ok(products);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
+    // 찜한 리스트 전체 삭제 API
+    @Transactional  // 트랜잭션으로 묶어 데이터의 일관성을 유지
+    @DeleteMapping("user/{username}/wishlist/delete")
+    public ResponseEntity<String> deleteAllWishlist(@PathVariable String username) {
+        try {
+            boolean success = userService.deleteAllWishlistItems(username);
+            if (success) {
+                return ResponseEntity.ok("찜 리스트가 성공적으로 삭제되었습니다.");
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 사용자의 찜 리스트를 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            // 예외 처리 및 로그 출력
+            System.err.println("Error deleting wishlist: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("찜 리스트 삭제 중 오류 발생");
         }
     }
 
