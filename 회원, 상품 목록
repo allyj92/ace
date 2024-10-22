@@ -1,0 +1,69 @@
+package com.example.productmember.model;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private double price;
+    private String description;
+
+    public Product(String name, double price, String description) {
+        this.name = name;
+        this.price = price;
+        this.description = description;
+    }
+}
+
+ackage com.example.productmember.model;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import javax.persistence.*;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String username;
+    private String password;
+    private String role; // 'ADMIN' 또는 'CUSTOMER'
+
+    public User(String username, String password, String role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
+}
+
+package com.ex.podctemigre.repositery;
+import com. example. prodcEesemier.repoiotory;
+
+import com.ex.prodct.exela.protdiccol();
+public imterleat distorypaostitoy sente springboot<Prodict.iomg{};
+
+package com example.produtemder.repository;
+
+import com.example.prodctemder.model.user;
+import org.springframwork.dat.ja.repositry.jpataponsitory;
+
