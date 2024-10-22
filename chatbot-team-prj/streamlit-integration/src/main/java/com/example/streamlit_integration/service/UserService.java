@@ -5,15 +5,11 @@ import com.example.streamlit_integration.dto.UserDto;
 import com.example.streamlit_integration.entity.Product;
 import com.example.streamlit_integration.entity.User;
 import com.example.streamlit_integration.entity.WishlistItem;
-import com.example.streamlit_integration.repository.ProductDocumentRepository;
+import com.example.streamlit_integration.repository.ProductRepository;
 import com.example.streamlit_integration.repository.UserRepository;
 import com.example.streamlit_integration.repository.WishlistItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -26,7 +22,7 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    ProductDocumentRepository productDocumentRepository;
+    ProductRepository productRepository;
 
     @Autowired
     private WishlistItemRepository wishlistItemRepository;
@@ -101,7 +97,7 @@ public class UserService {
 
                     // Product가 저장되어 있지 않으면 먼저 저장
                     if (product.getId() == null) {
-                        product = productDocumentRepository.save(product);  // Product를 먼저 저장
+                        product = productRepository.save(product);  // Product를 먼저 저장
                     }
 
                     WishlistItem wishlistItem = new WishlistItem();
