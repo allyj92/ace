@@ -16,4 +16,10 @@ public class ProductService {
     public List<Product> getSimilarProducts(String certNum) {
         return productRepository.findByCertificationNumber(certNum);
     }
+
+    // 새로운 V/A 기반 제품 검색 로직
+    public List<Product> getSimilarProductsByVA(double voltage, double current) {
+        // 전압과 전류 값으로 제품을 검색하는 로직
+        return productRepository.findByVoltageAndCurrent(voltage, current);
+    }
 }
